@@ -13,5 +13,5 @@ Vue.use(ElementUI);
 new Vue({
   router,
   store,
-  render: (createElement) => createElement(App)
+  render: createElement => createElement(App)
 }).$mount("#app");

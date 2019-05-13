@@ -20,11 +20,8 @@
     </div>
     <div class="BrandAdmin-main-container-list">
       <el-table
-        ref="multipleTable"
         :data="tableData"
-        style="width: 100%"
-        @selection-change="handleSelectionChange"
-      >
+        style="width: 100%">
         <el-table-column width="100" label="品牌ID" prop="id" />
         <el-table-column width="120" label="品牌名称" prop="brand_name" />
         <el-table-column width="200" label="品牌ICON">
@@ -78,7 +75,7 @@
           style="width:70%;margin:0 auto"
         >
           <el-form-item label="品牌ID" v-if="title == '修改品牌'">
-            <el-input v-model="changebrand.id" disabled="true"></el-input>
+            <el-input v-model="changebrand.id" disabled></el-input>
           </el-form-item>
           <el-form-item label="品牌名称">
             <el-input v-model="changebrand.brand_name"></el-input>
@@ -136,6 +133,7 @@
 </template>
 <script>
 export default {
+  name: "hotelBrand",
   data() {
     return {
       branddialogVisible: false,
@@ -145,6 +143,7 @@ export default {
         action: "https://www.istuadmission.com/BlueSky/UploadServlet",
         data1: { aid: null, title: "", info: "", img: null }
       },
+      fileList1:[],
       searchform: {
         id: null,
         brand_name: null
@@ -183,6 +182,12 @@ export default {
       this.title = "新增品牌";
       this.changebrand = {};
       this.branddialogVisible = true;
+    },
+    onBeforeUpload(){
+
+    },
+    handleExceed(){
+
     }
   }
 };

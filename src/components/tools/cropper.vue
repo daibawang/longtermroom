@@ -64,7 +64,6 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import VueCropper from "vue-cropper";
 export default {
   data() {
@@ -89,6 +88,10 @@ export default {
     };
   },
   props: ["imgFile", "fixedNumber"],
+  mounted:function(){
+    console.log(VueCropper);
+    console.log("zz");
+  },
   methods: {
     changeScale(num) {
       // 图片缩放

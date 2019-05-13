@@ -68,27 +68,16 @@
         </div>
       </el-form>
     </div>
-    <vueCropper ref="cropper"
-                    :img="option.img"
-                    :outputSize="option.outputSize"
-                    :outputType="option.outputType"
-                    :info="option.info"
-                    :canScale="option.canScale"
-                    :autoCrop="option.autoCrop"
-                    :autoCropWidth="option.autoCropWidth"
-                    :autoCropHeight="option.autoCropHeight"
-                    :fixed="option.fixed"
-                    :fixedNumber="option.fixedNumber">
-        </vueCropper>
-    <!-- <UploadCutImg></UploadCutImg> -->
+    <UploadCutImg></UploadCutImg>
   </div>
 </template>
 <script>
-import VueCropper from "vue-cropper"
-// import UploadCutImg from "@/components/UploadCutImg.vue";
+import VueCropper from "vue-cropper";
+import UploadCutImg from "@/components/UploadCutImg.vue";
 export default {
+  name: "hotelCity",
   components: {
-    // UploadCutImg
+    UploadCutImg
   },
   data() {
     return {

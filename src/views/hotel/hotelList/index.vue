@@ -159,13 +159,13 @@
               style="margin-left:7px"
               size="small"
               type="success"
-              @click="handlepass(scope.$index, scope.row)"
+              @click="handleSee(scope.$index, scope.row)"
               >查看</el-button
             >
             <el-button
               size="small"
               type="primary"
-              @click="handleEdit(scope.$index, scope.row)"
+              @click="handleAdmin(scope.$index, scope.row)"
               >管理</el-button
             >
           </template>
@@ -302,7 +302,7 @@
             </el-time-picker>
           </el-form-item>
           <el-form-item label="添加酒店图集">
-            <el-upload
+            <!-- <el-upload
               class="upload-demo"
               :action="params.action"
               :before-upload="onBeforeUpload"
@@ -324,7 +324,7 @@
               <div slot="tip" class="el-upload__tip">
                 只能上传jpg/png文件，且不超过500kb
               </div>
-            </el-upload>
+            </el-upload> -->
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -341,6 +341,7 @@ import { selectAllCities } from "@/api/api.js";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import myRouter from "@/router/router";
 export default {
+  name: "hotelList",
   // 城市 区域 名称 id 售卖状态
   data() {
     return {
@@ -503,12 +504,15 @@ export default {
         })
         .catch(_ => {});
     },
-    handleEdit(index, row) {
+    handleAdmin(index, row) {
       this.dialogFormVisible = true;
       this.title = "修改酒店";
       this.addhotel = false;
       this.changehotel = true;
       this.changeinfoall = row;
+    },
+    handleSee(index,row){
+      
     },
     handleSelectionChange() {},
     //图集上传操作
