@@ -9,10 +9,17 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "core-js": "^2.6.5",
+    "cropper": "^4.0.0",
+    "element-ui": "^2.8.2",
+    "js": "^0.1.0",
+    "nprogress": "^0.2.0",
     "vue": "^2.6.10",
+    "vue-cropper": "^0.4.9",
     "vue-router": "^3.0.3",
-    "vuex": "^3.0.1"
+    "vuex": "^3.0.1",
+    "vuex-persistedstate": "^2.5.4"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.6.0",
@@ -24,6 +31,8 @@
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^23.6.0",
+    "babel-plugin-component": "^1.1.1",
+    "babel-preset-stage-1": "^6.24.1",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "less": "^3.0.4",
