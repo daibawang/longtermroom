@@ -5,6 +5,7 @@ import mutations from "./mutations";
 import actions from "./actions";
 import getters from "./getters";
 import hotel from "./modules/hotel";
+import room from "./modules/Room";
 //引入vuex 数据持久化插件,将state中数据存储到localStorag中
 import createPersistedState from "vuex-persistedstate";
 Vue.use(Vuex);
@@ -20,6 +21,7 @@ export default new Vuex.Store({
   getters,
   modules: {
     hotel,
+    room,
     order: {
       namespaced: true,
       state: {

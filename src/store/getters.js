@@ -7,6 +7,9 @@ const getters = {
   },
   creatRouter(state) {
     return state.secondrouter.children;
+  },
+  whatRouter(state) {
+    return state.secondrouter.name;
   }
 };
 export default getters;

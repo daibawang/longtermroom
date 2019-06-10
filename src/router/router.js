@@ -52,6 +52,27 @@ const myRouter = new Router({
           ]
         },
         {
+          path: "/house",
+          name: "House",
+          component: () => import("@/views/house/index"),
+          redirect: "/house/houseList",
+          meta: { title: "房型" },
+          children: [
+            {
+              path: "houseList",
+              component: () => import("@/views/house/houseList/index"), // Parent router-view
+              name: "houseList",
+              meta: { title: "售卖管理" }
+            },
+            {
+              path: "houseRoom",
+              component: () => import("@/views/house/houseRoom/index"), // Parent router-view
+              name: "houseRoom",
+              meta: { title: "房型管理" }
+            }
+          ]
+        },
+        {
           path: "/order",
           name: "Order",
           component: () => import("@/views/order/index"),
@@ -62,21 +83,6 @@ const myRouter = new Router({
               path: "orderList",
               component: () => import("@/views/order/orderList/index"), // Parent router-view
               name: "orderList",
-              meta: { title: "订单查询" }
-            }
-          ]
-        },
-        {
-          path: "/house",
-          name: "Order",
-          component: () => import("@/views/house/index"),
-          redirect: "/house/houseList",
-          meta: { title: "订单" },
-          children: [
-            {
-              path: "houseList",
-              component: () => import("@/views/house/houseList/index"), // Parent router-view
-              name: "houseList",
               meta: { title: "订单查询" }
             }
           ]
@@ -126,3 +132,6 @@ myRouter.afterEach(() => {
   NProgress.done(); // 结束Progress
 });
 export default myRouter;
+
+
+// Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiYWRtaW4iLCJzdWIiOiJhZG1pbiIsImlhdCI6MTU1OTA1OTk4OCwiZXhwIjoxNTU5NjY0Nzg4fQ.Lf0a4djjUz79AnuzIGFQ1Sc8nukB6m1XSuWWI4cm-p2t-W0jw5S7DltM0NKNWtIEgOQgi6IY8DFBGUp20uQx6A

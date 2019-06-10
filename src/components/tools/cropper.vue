@@ -66,6 +66,9 @@
 <script>
 import VueCropper from "vue-cropper";
 export default {
+  components: { 
+    'VueCropper':VueCropper.vueCropper
+    },
   data() {
     return {
       previews: {}, // 预览数据
@@ -89,8 +92,6 @@ export default {
   },
   props: ["imgFile", "fixedNumber"],
   mounted:function(){
-    console.log(VueCropper);
-    console.log("zz");
   },
   methods: {
     changeScale(num) {
@@ -129,7 +130,6 @@ export default {
       }
     }
   },
-  components: { VueCropper }
 };
 </script>
 <style>

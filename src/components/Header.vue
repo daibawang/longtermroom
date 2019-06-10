@@ -18,15 +18,15 @@
                 <p class="sanjiao"></p>
               </div>
             </router-link>
-            <router-link to="/order">
-              <div class="hender-container-top-item">
-                <span>订单</span>
-                <p class="sanjiao"></p>
-              </div>
-            </router-link>
             <router-link to="/house">
               <div class="hender-container-top-item">
                 <span>房型</span>
+                <p class="sanjiao"></p>
+              </div>
+            </router-link>
+            <router-link to="/order">
+              <div class="hender-container-top-item">
+                <span>订单</span>
                 <p class="sanjiao"></p>
               </div>
             </router-link>

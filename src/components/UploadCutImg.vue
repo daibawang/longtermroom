@@ -44,7 +44,7 @@
         }"
       ></i>
       <!-- 单图片上传状态显示 -->
-      <!-- <div v-if="imageUrl" class="reupload" ref="reupload" @click.stop="handlePreviewSingle" @mouseenter="mouseEnter" @mouseleave="mouseLeave" :style="{width:reuploadWidth+'px',height:reuploadWidth+'px','line-height':reuploadWidth+'px','font-size':reuploadWidth/5+'px'}">重新上传</div> -->
+      <div v-if="imageUrl" class="reupload" ref="reupload" @click.stop="handlePreviewSingle" @mouseenter="mouseEnter" @mouseleave="mouseLeave" :style="{width:reuploadWidth+'px',height:reuploadWidth+'px','line-height':reuploadWidth+'px','font-size':reuploadWidth/5+'px'}">重新上传</div>
       <div
         id="uploadIcon"
         v-if="imageUrl"
@@ -119,6 +119,7 @@
 </template>
 <script>
 import Cropper from "@/components/tools/cropper.vue";
+import { uploadapi } from "@/api/api.js";
 // import axios from '@/assets/js/axios'
 export default {
   name: "UploadCutImg",
@@ -129,7 +130,7 @@ export default {
     targetUrl: {
       // 上传地址
       type: String,
-      default: "/UploadHandleServlet"
+      default: "album/uploadAlbum"
     },
     multiple: {
       // 多图开关
@@ -243,6 +244,8 @@ export default {
     /************************************************************************************/
 
     upload(data) {
+      console.log("uploass");
+      
       // 自定义upload事件
       if (!this.multiple) {
         // 如果单图，则显示正在上传
@@ -250,6 +253,15 @@ export default {
       }
       let formData = new FormData();
       formData.append("attachment", data);
+      uploadapi(formData)
+        .then(res => {
+          console.log("zzz");
+           console.log(res);
+        })
+        .catch(err => {
+          console.log(err);
+          
+        });
       // axios.post(this.targetUrl, formData).then(res => {
       //   if (!this.multiple) {
       //     // 上传完成后隐藏正在上传

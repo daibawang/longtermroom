@@ -9,6 +9,10 @@ axios.defaults.timeout = 60000; //设置接口超时时间
 axios.defaults.baseURL = "/apis/"; //根据环境设置基础路径
 axios.defaults.headers.post["Content-Type"] =
   "application/x-www-form-urlencoded;charset=UTF-8"; //设置编码
+// axios.defaults.headers.post["Content-Type"] =
+//   "application/json"; //设置编码
+axios.defaults.headers.put["Content-Type"] =
+  "application/x-www-form-urlencoded;charset=UTF-8";
 let loading = null; //初始化loading
 
 /*请求前拦截
@@ -129,7 +133,7 @@ export function get(url, params) {
  *@param {Object} params [请求时候携带的参数]
  */
 export function post(url, params) {
-  var data = Qs.stringify(params);
+  var data = Qs.stringify(params,);
   return new Promise((resolve, reject) => {
     axios
       .post(url, data)
@@ -142,16 +146,15 @@ export function post(url, params) {
   });
 }
 /*
- *put方法，对应put请求
+ *post_json方法
  *@param {String} url [请求的url地址]
  *@param {Object} params [请求时候携带的参数]
  */
-export function put(url, params) {
+export function post_json(url,params ) {
+  // var data = Qs.stringify(params,{arrayFormat: 'repeat'});
   return new Promise((resolve, reject) => {
     axios
-      .put(url, {
-        params
-      })
+      .post(url, params)
       .then(res => {
         resolve(res);
       })
@@ -162,6 +165,64 @@ export function put(url, params) {
 }
 
 /*
+ *post_jsonheader方法，对应application/json请求头
+ *@param {String} url [请求的url地址]
+ *@param {Object} params [请求时候携带的参数]
+ */
+// export function post_jsonheader(url,params ) {
+//   // var data = Qs.stringify(params,{arrayFormat: 'repeat'});
+//   return new Promise((resolve, reject) => {
+//     axios
+//       .post(url, params)
+//       .headers("application/json")
+//       .then(res => {
+//         resolve(res);
+//       })
+//       .catch(err => {
+//         reject(err);
+//       });
+//   });
+// }
+/*
+ *put方法，对应put请求
+ *@param {String} url [请求的url地址]
+ *@param {Object} params [请求时候携带的参数]
+ */
+export function put(url, params) {
+  var data = Qs.stringify(params);
+  return new Promise((resolve, reject) => {
+    axios
+      .put(url,data)
+      .then(res => {
+        resolve(res);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+}
+/*
+ *put_json方法，对应put请求,使用application/json请求头
+ *@param {String} url [请求的url地址]
+ *@param {Object} params [请求时候携带的参数]
+ */
+export function put_json(url, params) {
+  // var data = Qs.stringify(params);
+  axios.create({
+    headers: {'Content-Type': 'application/json'}
+  });
+  return new Promise((resolve, reject) => {
+    axios
+      .put(url,params)
+      .then(res => {
+        resolve(res);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+}
+/*
  *delete方法，对应delete请求
  *@param {String} url [请求的url地址]
  *@param {Object} params [请求时候携带的参数]
@@ -169,9 +230,22 @@ export function put(url, params) {
 export function _delete(url, params) {
   return new Promise((resolve, reject) => {
     axios
-      .delete(url, {
-        params
+      .delete(url, {data: params})
+      .then(res => {
+        resolve(res);
       })
+      .catch(err => {
+        reject(err);
+      });
+  });
+}
+
+export function _delete_stringfty(url, params) {
+  return new Promise((resolve, reject) => {
+    console.log(params);
+    // var data = Qs.stringify(params);
+    axios
+      .delete(url,{params: params})
       .then(res => {
         resolve(res);
       })

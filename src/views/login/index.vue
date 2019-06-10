@@ -69,36 +69,27 @@ export default {
       // console.log(process.env.BASE_URL);
       this.$refs[formName].validate(valid => {
         if (valid) {
-          //这里模拟管理员以及用户两种权限,一般的都是登陆后接口传过来
-          // let roles=[]
-          // roles.push(this.ruleForm2.username)
-          // this.$store.commit("COMMIT_ROLE", roles);
-          // this.$router.push({
-          //       path: "/home"
-          //     });
-          console.log(this.ruleForm2);
-          // login(this.ruleForm2)
-          //   .then(res => {
-          //     console.log(res);
-
-          //     //提交数据到vuex
-          //     var jwt=getCookie('jwt')
-          //     this.$store.commit("commitToken", jwt);
-          //     this.$store.commit("commitInfo", res.user);
-          //     if(res.user.role=='user'){
-          //       this.$router.push({
-          //         path: "/403"
-          //       });
-          //     }
-          //     this.$message('success',res.message)
-          //     this.$router.push({
-          //       path: "/"
-          //     });
-          //   })
-          //   .catch(err => {
-          //     this.$store.commit("removeToken");
-          //     // this.$message("error", err.message);
-          //   });
+          login(this.ruleForm2)
+            .then(res => {
+              // console.log(res);
+              //提交数据到vuex
+              var jwt=getCookie('jwt')
+              this.$store.commit("commitToken", jwt);
+              this.$store.commit("commitInfo", res.user);
+              if(res.user.role=='user'){
+                this.$router.push({
+                  path: "/403"
+                });
+              }
+              this.$message('success',res.message)
+              this.$router.push({
+                path: "/"
+              });
+            })
+            .catch(err => {
+              this.$store.commit("removeToken");
+              // this.$message("error", err.message);
+            });
         } else {
           return false;
         }
@@ -109,5 +100,6 @@ export default {
     }
   }
 };
+// Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiYWRtaW4iLCJzdWIiOiJhZG1pbiIsImlhdCI6MTU1Nzc1MDg5MSwiZXhwIjoxNTU4MzU1NjkxfQ.wwinrjJMzejR-kk299hj9eDnETUGuUao1YnEo50EYBYkHeseCM8GGjW9n-oaW2MShrrQ_H78i14_3cJ9r5dz8g
 </script>
 <style lang="less" scoped></style>

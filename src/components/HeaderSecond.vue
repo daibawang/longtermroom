@@ -2,7 +2,7 @@
   <div class="Hotel-index-hender">
     <div class="Hotel-index-hender-container">
       <div class="Hotel-container-view">
-        <div class="Hotel-container-view-placeholder"></div>
+        <div class="Hotel-container-view-placeholder" :style="styles"></div>
         <div class="Hotel-container-view-itemview">
           <div v-for="item in creatRouter" :key="item.path">
             <router-link :to="item.path">
@@ -38,12 +38,27 @@ import { mapState, mapGetters } from "vuex";
 export default {
   name: "HeaderSecond",
   data() {
-    return {};
+    return {
+      styles:{
+        width:'270px'
+      }
+    };
   },
   computed: {
-    ...mapGetters(["creatRouter"])
+    ...mapGetters({
+      creatRouter:'creatRouter',
+      whatRouter:'whatRouter'
+    }),
   },
-  created: function() {}
+  created: function() {
+    if(this.whatRouter=='House'){
+      this.styles.width="380px"
+    }else if(this.whatRouter=='Hotel'){
+      this.styles.width="270px"
+    }else if(this.whatRouter=='Order'){
+      this.styles.width="400px"
+    }
+  }
 };
 </script>
 

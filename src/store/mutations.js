@@ -3,7 +3,7 @@
  */
 // import { myRouter } from "@/router/router";
 import { setCookie } from "@/assets/js/cookie.js";
-import { FATHER } from "./mutation-types";
+import { FATHER } from "@/store/mutation-types";
 const mutations = {
   [FATHER.COMMIT_TOKEN](state, token) {
     state.token = token;
