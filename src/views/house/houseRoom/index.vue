@@ -65,9 +65,9 @@
                 </el-form>
             </template>
         </el-table-column>
-        <el-table-column width="100" label="房型ID" prop="id" />
-        <el-table-column width="170" label="房型名称" prop="roomName" />
-        <el-table-column width="110" label="房间数量" prop="roomNum"/>
+        <el-table-column width="80" label="房型ID" prop="id" />
+        <el-table-column width="150" label="房型名称" prop="roomName" />
+        <el-table-column width="100" label="房间数量" prop="roomNum"/>
         <el-table-column width="110" label="楼层">
             <template slot-scope="scope">
                 {{scope.row.location1}}-{{scope.row.location2}}层
@@ -78,12 +78,12 @@
                 {{scope.row.area}}m^2
             </template>
         </el-table-column>
-        <el-table-column width="120" label="加床" >
+        <el-table-column width="110" label="加床" >
             <template slot-scope="scope">
                 {{ scope.row.addBed == 0 ? "不可加床" : "可加床" }}
             </template>
         </el-table-column>
-        <el-table-column width="120" label="是否有窗">
+        <el-table-column width="110" label="是否有窗">
             <template slot-scope="scope">
                 {{ scope.row.window == 0 ? "无窗" : "有窗" }}
             </template>
@@ -97,15 +97,26 @@
               @click="change(scope.$index, scope.row)"
               >修改</el-button
             >
-            <!-- <el-button
+            <el-button
               size="small"
-              type="danger"
-              @click="handleEdit(scope.$index, scope.row)"
-              >删除</el-button
-            > -->
+              type="success"
+              @click="ImgAdmin(scope.$index, scope.row)"
+              >图集管理</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
+      <div class="HouseRoom-main-container-pagination">
+        <!-- 分页 -->
+        <el-pagination
+          @current-change="handleCurrentChange"
+          background
+          :page-size="pageSize"
+          layout="prev, pager, next"
+          :total="total"
+        >
+        </el-pagination>
+      </div>
       <el-dialog :visible.sync="roomdialogVisible" :title="title">
         <el-form
           ref="changeroom"
@@ -256,14 +267,60 @@
           <el-button type="primary" @click="addapproval">确 定</el-button>
         </div>
       </el-dialog>
+      <el-dialog :visible.sync="roomimgVisible">
+        <div class="img-show-view">
+          <div class="img-show-item" v-for="url in urls" :key="url.id">
+            <!-- <span class="demonstration">{{ fit }}</span> -->
+            <span class="delete-icon" @click="deleteimg(url.id)"
+              ><i class="el-icon-error"></i
+            ></span>
+            <el-image
+              style="width: 210px; height: 100px"
+              :src="url.url"
+              fit="fit"
+            >
+              <div
+                slot="placeholder"
+                style="width: 210px; height: 100px;text-align:center;line-height: 100px"
+              >
+                加载中<span class="dot">...</span>
+              </div>
+            </el-image>
+          </div>
+          <div class="img-show-btn">
+            <i class="el-icon-plus" @click="show = true"></i>
+          </div>
+        </div>
+      </el-dialog>
+      <!-- 裁剪组件 -->
+      <my-upload
+        field="pic"
+        @crop-upload-success="cropUploadSuccess"
+        v-model="show"
+        :width="width"
+        :height="height"
+        :url="uploadUrl"
+        :noCircle="true"
+        :noSquare="noSquare"
+        :params="params"
+        :headers="myHeader"
+        :maxSize="maxSize"
+        img-format="png"
+      >
+      </my-upload>
     </div>
   </div>
 </template>
 <script>
-import { deleteById,findRoomBed,selectAllCities,selectHotelList,findRoomByHotelId,updataRoomByid,insertRoom} from "@/api/api.js";
+import { selectRoomImg,deleteRoomImgapi,deleteById,findRoomBed,selectAllCities,selectHotelList,findRoomByHotelId,updataRoomByid,insertRoom} from "@/api/api.js";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
+import { getCookie } from "@/assets/js/cookie.js";
+import myUpload from "vue-image-crop-upload";
 export default {
   name: "hotelRoom",
+  components: {
+    "my-upload": myUpload
+  },
   data() {
     return {
         canadd:false,
@@ -287,6 +344,21 @@ export default {
         optionnetwork:this.GLOBAL.networkoption,
         optionsmoke:this.GLOBAL.smokeoption,
         optionfacilities:this.GLOBAL.facilitiesoption,
+        cur_page:null,
+        total: null, //总条数
+        pageSize: 4, //每页显示数量，后台确定
+        roomimgVisible:false,
+        show: false, // 控制组件显示
+        uploadUrl: "/apis/album/uploadRoomAlbum", // 上传地址
+        params: { roomId: null }, //传递参数
+        myHeader: { Authorization: "Bearer " + getCookie("jwt") },
+        fieldName: "pic", // 上传文件名
+        noCircle: true,
+        noSquare: false,
+        width: 600, // 裁剪图片宽高(即所需要图片的宽高)
+        height: 375,
+        maxSize: 10240, // 大小限制
+        urls: [], //图集列表
     };
   },
   created: function() {
@@ -315,36 +387,45 @@ export default {
     })
   },
   methods: {
-  //查询区域
+    //分页器
+    handleCurrentChange(val) {
+      this.cur_page = val;
+      console.log("当前页" + this.cur_page);
+      this.searchroom(this.searchform.hotelid);
+    },
+  //查询物理房型
     searchroom(hotelid) {
       if (hotelid != null) {
           this.canadd=true;
-          findRoomByHotelId({hotelId:hotelid})
+          findRoomByHotelId({hotelId:hotelid,page:this.cur_page})
             .then(res=>{
+                this.total=res.result.total;
                 var areaarray=[];
                 var location=[];
                 var showbedList=[];
-                for(var i=0;i<res.result.length;i++){
-                    areaarray=res.result[i].area.split('m');
-                    location=res.result[i].location.split('-');
-                    res.result[i].location1=location[0];
-                    res.result[i].location2=location[1].split('层')[0];
-                    res.result[i].area=areaarray[0];
-                    for(var j=0;j<res.result[i].roomBedList.length;j++){
-                        showbedList.push(res.result[i].roomBedList[j].bedName+","+res.result[i].roomBedList[j].number+"张,"+res.result[i].roomBedList[j].width+"米");                  
+                var roomlist = res.result.list;
+                for(var i=0;i<roomlist.length;i++){
+                    areaarray=roomlist[i].area.split('m');
+                    location=roomlist[i].location.split('-');
+                    roomlist[i].location1=location[0];
+                    roomlist[i].location2=location[1].split('层')[0];
+                    roomlist[i].area=areaarray[0];
+                    for(var j=0;j<roomlist[i].roomBedList.length;j++){
+                        showbedList.push(roomlist[i].roomBedList[j].bedName+","+roomlist[i].roomBedList[j].number+"张,"+roomlist[i].roomBedList[j].width+"米");                  
                     }
-                    res.result[i].facilities=res.result[i].facilities.split("##");
-                    res.result[i].newfacilities=this.optionfacilities;
-                    for(var j=0;j<res.result[i].newfacilities.length;j++){
-                      res.result[i].newfacilities[j].value=res.result[i].facilities[j];
+                    roomlist[i].facilities=roomlist[i].facilities.split("##");
+                    roomlist[i].newfacilities=this.optionfacilities;
+                    for(var j=0;j<roomlist[i].newfacilities.length;j++){
+                      roomlist[i].newfacilities[j].value=roomlist[i].facilities[j];
                     }
-                    res.result[i].showbedtype=(showbedList.length>0?showbedList.join("<br/>"):"暂无床型");
+                    roomlist[i].showbedtype=(showbedList.length>0?showbedList.join("<br/>"):"暂无床型");
                     showbedList=[];
-                    delete res.result[i]['gmtCreat'];
-                    delete res.result[i]['gmtModified'];
-                    // res.result[i].area=area[0]
+                    delete roomlist[i]['gmtCreat'];
+                    delete roomlist[i]['gmtModified'];
+                    // roomlist[i].area=area[0]
                 }
-                this.tabledata=res.result
+                console.log(roomlist);
+                this.tabledata=roomlist
                 console.log(this.tabledata);
             })
             .catch(err=>{
@@ -367,7 +448,6 @@ export default {
     //修改物理房型
     change(index, row) {
       this.title = "修改物理房型";
-
       this.changeroom = row;
       for(var i=0;i<this.changeroom.facilities.length;i++){
         this.optionfacilities[i].value=this.changeroom.facilities[i];
@@ -454,11 +534,80 @@ export default {
                         this.searchroom(this.searchform.hotelid);
                         this.roomdialogVisible = false;
                         this.changeroom={};
+                        this.$confirm("是否为物理房型增加图片")
+                        .then(_ => {
+                          this.uploadnewimg(res.id);
+                        })
+                        .catch(_ => {});
                     }
                 })
         }
       }
        
+    },
+    //图集管理
+    ImgAdmin(index, row){
+      this.urls=[];
+      this.loadingimg(row.id);
+      this.roomimgVisible = true;
+      this.params.roomId = parseInt(row.id);
+    },
+    //新增物理房型时添加图的方法
+    uploadnewimg(roomid) {
+      this.roomimgVisible = true;
+      this.params.roomId = parseInt(roomid);
+    },
+    loadingimg(qroomId) {
+      // console.log("调用了loadingimg");
+      var param = { roomId: qroomId };
+      selectRoomImg(param)
+        .then(res => {
+          this.urls = res.result;
+          for (var j = 0; j < this.urls.length; j++) {
+            this.urls[j].url = "apis/image/" + this.urls[j].url;
+          }
+        })
+        .catch(err => {});
+    },
+    //显示裁剪组件
+    toggleShow() {
+      this.show = !this.show;
+    },
+    cropUploadSuccess(jsonData, field) {
+      // console.log('-------- upload success --------');
+      this.loadingimg(this.params.roomId);
+      // console.log(jsonData);
+      // console.log('field: ' + field);
+    },
+    //删除图片
+    deleteimg(imgid) {
+      var deletepram = { id: parseInt(imgid) };
+      // console.log(deletepram);
+      this.$confirm("是否删除该物理房型图片?", "提示", {
+        distinguishCancelAndClose: true,
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+      .then(() => {
+        console.log("确定删除");
+        deleteRoomImgapi(deletepram)
+          .then(res => {
+            this.loadingimg(this.param.roomId);
+            this.$message({
+              type: "success",
+              message: "删除成功!"
+            });
+          })
+          .catch(err => {});
+      })
+      .catch(() => {
+        // console.log("已取消删除");
+        this.$message({
+          type: "info",
+          message: "已取消删除"
+        });
+      });
     },
     //添加床型
     addDomain () {
@@ -581,6 +730,44 @@ export default {
       width:90px;text-align:center;margin-right:5px
     }
 
+  }
+  &-pagination {
+    float: right;
+    margin: 20px 20px 0 0;
+  }
+  .img-show-view {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: left;
+    .img-show-item {
+      // width:23%;
+      margin: 5px;
+      position: relative;
+    }
+    .delete-icon {
+      color: red;
+      position: absolute;
+      top: -7px;
+      right: -3px;
+      z-index:1;
+    }
+    .img-show-btn {
+      margin-top: 5px;
+      margin-left: 10px;
+      background-color: #fbfdff;
+      border: 1px dashed #c0ccda;
+      border-radius: 6px;
+      box-sizing: border-box;
+      width: 205px;
+      height: 100px;
+      text-align: center;
+      cursor: pointer;
+      line-height: 100px;
+      vertical-align: top;
+      font-size: 28px;
+      color: #8c939d;
+    }
   }
 }
 </style>

@@ -3,8 +3,8 @@ const state = {
   text: 1,
   cityoption: [], //城市列表
   commitCityArea: [], //城市区域列表
-  brandList:[],    //品牌列表
-  allHotelList:[]
+  brandList: [], //品牌列表
+  allHotelList: []
 };
 const getters = {
   //getters能取到全局state  getters:所有getters方法 rootState:全局state
@@ -12,11 +12,11 @@ const getters = {
     return state.text + "使用了全局state" + rootState.author;
   },
   getbrandoption(state) {
-    var returbrand=JSON.parse(JSON.stringify(state.brandList));
+    var returbrand = JSON.parse(JSON.stringify(state.brandList));
     for (var i = 0; i < returbrand.length; i++) {
-      delete returbrand[i]['icon'];
-      delete returbrand[i]['brandDetail'];
-      delete returbrand[i]['brandRemark'];
+      delete returbrand[i]["icon"];
+      delete returbrand[i]["brandDetail"];
+      delete returbrand[i]["brandRemark"];
     }
     return returbrand;
   }
@@ -27,7 +27,7 @@ const mutations = {
     console.log("hotel.state", state);
     state.text = text;
   },
-  [HOTEL.COMMIT_BRANDLIST](state,option){
+  [HOTEL.COMMIT_BRANDLIST](state, option) {
     state.brandList = option;
   },
   [HOTEL.COMMIT_CITYOPTION](state, option) {
@@ -36,7 +36,7 @@ const mutations = {
   [HOTEL.COMMIT_CITYAREA](state, option) {
     state.commitCityArea = option;
   },
-  [HOTEL.COMMIT_ALLHOTEL](state,option){
+  [HOTEL.COMMIT_ALLHOTEL](state, option) {
     state.allHotelList = option;
   }
 };

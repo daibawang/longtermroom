@@ -5,7 +5,7 @@ const state = {
 const getters = {
   getbedoption(state) {
     var returnbed = [];
-    var bedtype = {value:'',label:'',children:[]};
+    var bedtype = { value: "", label: "", children: [] };
     for (var i = 0; i < state.allBedOption.length; i++) {
       bedtype.value = i;
       bedtype.label = state.allBedOption[i].bedType;
@@ -16,7 +16,17 @@ const getters = {
         });
       }
       returnbed.push(bedtype);
-      bedtype={value:'',label:'',children:[]};
+      bedtype = { value: "", label: "", children: [] };
+    }
+    return returnbed;
+  },
+  getalllbedinfo(state) {
+    var returnbed = [];
+    for (var i = 0; i < state.allBedOption.length; i++) {
+      for (var j = 0; j < state.allBedOption[i].beds.length; j++) {
+        returnbed[state.allBedOption[i].beds[j].id] =
+          state.allBedOption[i].beds[j].bedName;
+      }
     }
     return returnbed;
   }
@@ -24,7 +34,7 @@ const getters = {
 const mutations = {
   //state是hotel模块里面的state
   [ROOM.COMMIT_ALLBEDINDO](state, option) {
-    state.allBedOption=[];
+    state.allBedOption = [];
     state.allBedOption = option;
   }
 };

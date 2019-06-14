@@ -39,24 +39,24 @@ export default {
   name: "HeaderSecond",
   data() {
     return {
-      styles:{
-        width:'270px'
+      styles: {
+        width: "270px"
       }
     };
   },
   computed: {
     ...mapGetters({
-      creatRouter:'creatRouter',
-      whatRouter:'whatRouter'
-    }),
+      creatRouter: "creatRouter",
+      whatRouter: "whatRouter"
+    })
   },
   created: function() {
-    if(this.whatRouter=='House'){
-      this.styles.width="380px"
-    }else if(this.whatRouter=='Hotel'){
-      this.styles.width="270px"
-    }else if(this.whatRouter=='Order'){
-      this.styles.width="400px"
+    if (this.whatRouter == "House") {
+      this.styles.width = "380px";
+    } else if (this.whatRouter == "Hotel") {
+      this.styles.width = "270px";
+    } else if (this.whatRouter == "Order") {
+      this.styles.width = "400px";
     }
   }
 };

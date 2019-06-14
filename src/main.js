@@ -6,6 +6,7 @@ import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 import "./assets/css/public.css";
 import global_ from "./components/tools/Global";
+import '@/icons' // icon
 Vue.prototype.$URL = process.env.API_ROOT;
 Vue.prototype.GLOBAL = global_;
 Vue.config.productionTip = false;

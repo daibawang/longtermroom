@@ -133,5 +133,4 @@ myRouter.afterEach(() => {
 });
 export default myRouter;
 
-
 // Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiYWRtaW4iLCJzdWIiOiJhZG1pbiIsImlhdCI6MTU1OTA1OTk4OCwiZXhwIjoxNTU5NjY0Nzg4fQ.Lf0a4djjUz79AnuzIGFQ1Sc8nukB6m1XSuWWI4cm-p2t-W0jw5S7DltM0NKNWtIEgOQgi6IY8DFBGUp20uQx6A

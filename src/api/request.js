@@ -133,7 +133,7 @@ export function get(url, params) {
  *@param {Object} params [请求时候携带的参数]
  */
 export function post(url, params) {
-  var data = Qs.stringify(params,);
+  var data = Qs.stringify(params);
   return new Promise((resolve, reject) => {
     axios
       .post(url, data)
@@ -150,7 +150,7 @@ export function post(url, params) {
  *@param {String} url [请求的url地址]
  *@param {Object} params [请求时候携带的参数]
  */
-export function post_json(url,params ) {
+export function post_json(url, params) {
   // var data = Qs.stringify(params,{arrayFormat: 'repeat'});
   return new Promise((resolve, reject) => {
     axios
@@ -192,7 +192,7 @@ export function put(url, params) {
   var data = Qs.stringify(params);
   return new Promise((resolve, reject) => {
     axios
-      .put(url,data)
+      .put(url, data)
       .then(res => {
         resolve(res);
       })
@@ -209,11 +209,11 @@ export function put(url, params) {
 export function put_json(url, params) {
   // var data = Qs.stringify(params);
   axios.create({
-    headers: {'Content-Type': 'application/json'}
+    headers: { "Content-Type": "application/json" }
   });
   return new Promise((resolve, reject) => {
     axios
-      .put(url,params)
+      .put(url, params)
       .then(res => {
         resolve(res);
       })
@@ -230,7 +230,7 @@ export function put_json(url, params) {
 export function _delete(url, params) {
   return new Promise((resolve, reject) => {
     axios
-      .delete(url, {data: params})
+      .delete(url, { params: params })
       .then(res => {
         resolve(res);
       })
@@ -245,7 +245,7 @@ export function _delete_stringfty(url, params) {
     console.log(params);
     // var data = Qs.stringify(params);
     axios
-      .delete(url,{params: params})
+      .delete(url, { params: params })
       .then(res => {
         resolve(res);
       })

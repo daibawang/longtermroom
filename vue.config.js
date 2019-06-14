@@ -20,7 +20,20 @@ module.exports = {
     config.resolve.alias
       // .set("vue$", resolve("vue/dist/vue.esm.js"))
       .set("@", resolve("src"))
-      .set("@img", resolve("src/assets/img"));
+      .set("@img", resolve("src/assets/img"))
+      .set("@svg", resolve("./src/icons/svg"));
+    config.module.rules.delete("svg"); // 重点:删除默认配置中处理svg,
+    config.module
+      .rule("svg-sprite-loader")
+      .test(/\.svg$/)
+      .include
+      .add(resolve("src/icons/svg")) // 处理svg目录
+      .end()
+      .use("svg-sprite-loader")
+      .loader("svg-sprite-loader")
+      .options({
+        symbolId: "icon-[name]"
+      });
   },
   devServer: {
     open: true,

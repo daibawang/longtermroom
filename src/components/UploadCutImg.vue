@@ -44,7 +44,22 @@
         }"
       ></i>
       <!-- 单图片上传状态显示 -->
-      <div v-if="imageUrl" class="reupload" ref="reupload" @click.stop="handlePreviewSingle" @mouseenter="mouseEnter" @mouseleave="mouseLeave" :style="{width:reuploadWidth+'px',height:reuploadWidth+'px','line-height':reuploadWidth+'px','font-size':reuploadWidth/5+'px'}">重新上传</div>
+      <div
+        v-if="imageUrl"
+        class="reupload"
+        ref="reupload"
+        @click.stop="handlePreviewSingle"
+        @mouseenter="mouseEnter"
+        @mouseleave="mouseLeave"
+        :style="{
+          width: reuploadWidth + 'px',
+          height: reuploadWidth + 'px',
+          'line-height': reuploadWidth + 'px',
+          'font-size': reuploadWidth / 5 + 'px'
+        }"
+      >
+        重新上传
+      </div>
       <div
         id="uploadIcon"
         v-if="imageUrl"
@@ -245,7 +260,7 @@ export default {
 
     upload(data) {
       console.log("uploass");
-      
+
       // 自定义upload事件
       if (!this.multiple) {
         // 如果单图，则显示正在上传
@@ -256,11 +271,10 @@ export default {
       uploadapi(formData)
         .then(res => {
           console.log("zzz");
-           console.log(res);
+          console.log(res);
         })
         .catch(err => {
           console.log(err);
-          
         });
       // axios.post(this.targetUrl, formData).then(res => {
       //   if (!this.multiple) {

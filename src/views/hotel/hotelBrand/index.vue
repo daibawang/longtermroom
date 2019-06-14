@@ -18,7 +18,9 @@
           </el-select> -->
         </el-form-item>
         <el-form-item>
-          <el-button type="success" style="width:100px" @click="tosearch">查询品牌</el-button>
+          <el-button type="success" style="width:100px" @click="tosearch"
+            >查询品牌</el-button
+          >
         </el-form-item>
         <el-form-item>
           <el-button type="primary" style="width:100px" @click="toadd"
@@ -28,9 +30,7 @@
       </el-form>
     </div>
     <div class="BrandAdmin-main-container-list">
-      <el-table
-        :data="tableData"
-        style="width: 100%">
+      <el-table :data="tableData" style="width: 100%">
         <el-table-column width="100" label="品牌ID" prop="id" />
         <el-table-column width="120" label="品牌名称" prop="brandName" />
         <el-table-column width="180" label="品牌ICON">
@@ -99,9 +99,9 @@
                   height="65px"
                   v-if="changebrand.iconshow"
                 />
-                <div :class="changebrand.iconshow?'flexrow-upload':''">
-                  <el-button size="mini" type="primary" @click="show=true">
-                    Upload<i class="el-icon-upload el-icon--right" ></i
+                <div :class="changebrand.iconshow ? 'flexrow-upload' : ''">
+                  <el-button size="mini" type="primary" @click="show = true">
+                    Upload<i class="el-icon-upload el-icon--right"></i
                   ></el-button>
                 </div>
               </div>
@@ -127,7 +127,8 @@
           <el-button type="primary" @click="addapproval">确 定</el-button>
         </div>
       </el-dialog>
-      <my-upload field="pic"
+      <my-upload
+        field="pic"
         @crop-upload-success="cropUploadSuccess"
         v-model="show"
         :width="width"
@@ -137,21 +138,27 @@
         :noSquare="noSquare"
         :headers="myHeader"
         :maxSize="maxSize"
-        img-format="png">
+        img-format="png"
+      >
       </my-upload>
     </div>
   </div>
 </template>
 <script>
-import { selectBrands,selectBrandByMany,updateBrand,insertBrand} from "@/api/api.js";
+import {
+  selectBrands,
+  selectBrandByMany,
+  updateBrand,
+  insertBrand
+} from "@/api/api.js";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
-import {subString} from "@/assets/js/common.js";
-import myUpload from 'vue-image-crop-upload';
+import { subString } from "@/assets/js/common.js";
+import myUpload from "vue-image-crop-upload";
 import { getCookie } from "@/assets/js/cookie.js";
 export default {
   name: "hotelBrand",
   components: {
-    'my-upload': myUpload
+    "my-upload": myUpload
   },
   data() {
     return {
@@ -162,14 +169,14 @@ export default {
       // 控制组件显示
       cropperShow: false,
       // 上传地址
-      uploadUrl: '/apis/upload/uploadPic',
-      myHeader:{"Authorization":"Bearer "+getCookie('jwt')},
+      uploadUrl: "/apis/upload/uploadPic",
+      myHeader: { Authorization: "Bearer " + getCookie("jwt") },
       noCircle: true,
       noSquare: false,
-      width: 300,// 裁剪图片宽高(即所需要图片的宽高)
+      width: 300, // 裁剪图片宽高(即所需要图片的宽高)
       height: 175,
-      maxSize: 10240,// 大小限制
-      fileList1:[],
+      maxSize: 10240, // 大小限制
+      fileList1: [],
       searchform: {
         id: null,
         brandName: null
@@ -177,22 +184,19 @@ export default {
       tableData: []
     };
   },
-  created: function() {
-
-  },
-  mounted () {
+  created: function() {},
+  mounted() {
     if (!this.$store.state.brandList) {
-      selectBrands({})
-        .then(res=>{
-          this.$store.commit("hotel/commitBrandList",res.result);
-        })
+      selectBrands({}).then(res => {
+        this.$store.commit("hotel/commitBrandList", res.result);
+      });
     }
   },
-  computed:{
+  computed: {
     ...mapGetters({
-        // textPlus: "hotel/getCityOption"
-        getbrandoption:"hotel/getbrandoption" //可选品牌
-      }),
+      // textPlus: "hotel/getCityOption"
+      getbrandoption: "hotel/getbrandoption" //可选品牌
+    })
     // ...mapState({
     //   cityoption: state => state.hotel.cityoption,
     //   commitCityArea:state => state.hotel.commitCityArea
@@ -200,24 +204,27 @@ export default {
   },
   methods: {
     //查询品牌
-    tosearch(){
-      var searchparm=JSON.parse(JSON.stringify(this.searchform))
-       //过滤多条件查询参数t
-      for(var attr in searchparm){
-        if(searchparm[attr] === null||searchparm[attr] === ''){
+    tosearch() {
+      var searchparm = JSON.parse(JSON.stringify(this.searchform));
+      //过滤多条件查询参数t
+      for (var attr in searchparm) {
+        if (searchparm[attr] === null || searchparm[attr] === "") {
           // console.log(attr);
           delete searchparm[attr];
           continue;
         }
       }
-      selectBrandByMany(searchparm)
-        .then(res=>{
-          this.tableData=res.result;
-          for(var i=0;i<this.tableData.length;i++){
-            this.tableData[i].brand_detail_sort=subString(this.tableData[i].brandDetail,100,true);
-            this.tableData[i].iconshow='apis/image/'+this.tableData[i].icon 
-          }
-        })
+      selectBrandByMany(searchparm).then(res => {
+        this.tableData = res.result;
+        for (var i = 0; i < this.tableData.length; i++) {
+          this.tableData[i].brand_detail_sort = subString(
+            this.tableData[i].brandDetail,
+            100,
+            true
+          );
+          this.tableData[i].iconshow = "apis/image/" + this.tableData[i].icon;
+        }
+      });
     },
     //修改品牌信息
     change(index, row) {
@@ -228,37 +235,33 @@ export default {
     },
     //确定修改
     addapproval() {
-        var parm=JSON.parse(JSON.stringify(this.changebrand))
-        delete parm['brand_detail_sort'];
-      if(this.title == "新增品牌"){
-        delete parm['id'];
-        if(this.changebrand.icon==null){
+      var parm = JSON.parse(JSON.stringify(this.changebrand));
+      delete parm["brand_detail_sort"];
+      if (this.title == "新增品牌") {
+        delete parm["id"];
+        if (this.changebrand.icon == null) {
           this.$confirm("请上传品牌图标");
-        }else{
-          insertBrand(parm)
-          .then(res=>{
-            if(res.message=="SUCCESS"){
-              this.$message(this.title+'成功',res.message);
+        } else {
+          insertBrand(parm).then(res => {
+            if (res.message == "SUCCESS") {
+              this.$message(this.title + "成功", res.message);
               this.tosearch();
               this.branddialogVisible = false;
             }
-          })
+          });
         }
-
       }
-      if(this.title == "修改品牌"){
-        delete parm['icon'];
-        delete parm['iconshow'];
-        updateBrand(parm)
-        .then(res=>{
-          if(res.message=="SUCCESS"){
-            this.$message(this.title+'成功',res.message);
+      if (this.title == "修改品牌") {
+        delete parm["icon"];
+        delete parm["iconshow"];
+        updateBrand(parm).then(res => {
+          if (res.message == "SUCCESS") {
+            this.$message(this.title + "成功", res.message);
             this.tosearch();
             this.branddialogVisible = false;
           }
-        })
+        });
       }
-
     },
     //新增品牌
     toadd() {
@@ -266,27 +269,22 @@ export default {
       this.changebrand = {};
       this.branddialogVisible = true;
     },
-    onBeforeUpload(){
-
-    },
-    handleExceed(){
-
-    },
-    cropUploadSuccess(jsonData, field){
-        console.log('-------- upload success --------');
-        console.log(jsonData);
-        this.changebrand.iconshow = 'apis/image/'+jsonData.path[0];
-        this.changebrand.icon = jsonData.path[0];
-        if(this.title == "修改品牌"){
-          var parm={id:this.changebrand.id,icon:jsonData.path[0]}
-          updateBrand(parm)
-          .then(res=>{
-            if(res.message=="SUCCESS"){
-              this.tosearch();
-            }
-          })
-        }
-		}
+    onBeforeUpload() {},
+    handleExceed() {},
+    cropUploadSuccess(jsonData, field) {
+      console.log("-------- upload success --------");
+      console.log(jsonData);
+      this.changebrand.iconshow = "apis/image/" + jsonData.path[0];
+      this.changebrand.icon = jsonData.path[0];
+      if (this.title == "修改品牌") {
+        var parm = { id: this.changebrand.id, icon: jsonData.path[0] };
+        updateBrand(parm).then(res => {
+          if (res.message == "SUCCESS") {
+            this.tosearch();
+          }
+        });
+      }
+    }
   }
 };
 </script>
@@ -311,10 +309,10 @@ export default {
   &-list {
     margin-top: 40px;
     width: 100%;
-    .flexrow{
+    .flexrow {
       display: flex;
       flex-direction: row;
-      .flexrow-upload{
+      .flexrow-upload {
         margin-top: 30px;
         margin-left: 30px;
       }

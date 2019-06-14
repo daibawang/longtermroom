@@ -73,15 +73,15 @@ export default {
             .then(res => {
               // console.log(res);
               //提交数据到vuex
-              var jwt=getCookie('jwt')
+              var jwt = getCookie("jwt");
               this.$store.commit("commitToken", jwt);
               this.$store.commit("commitInfo", res.user);
-              if(res.user.role=='user'){
+              if (res.user.role == "user") {
                 this.$router.push({
                   path: "/403"
                 });
               }
-              this.$message('success',res.message)
+              this.$message("success", res.message);
               this.$router.push({
                 path: "/"
               });
