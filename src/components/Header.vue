@@ -30,6 +30,12 @@
                 <p class="sanjiao"></p>
               </div>
             </router-link>
+            <router-link to="/other">
+              <div class="hender-container-top-item">
+                <span>其他</span>
+                <p class="sanjiao"></p>
+              </div>
+            </router-link>
           </div>
           <div class="hender-container-top-admin">
             <div class="top-admin-icon">
@@ -116,7 +122,7 @@ export default {
   width: 100%;
   background-color: #409eff;
   &-container {
-    width: 1050px;
+    width: 1100px;
     height: 70px;
     margin: 0 auto;
     .hender-container-top {
@@ -243,7 +249,7 @@ export default {
         cursor: pointer;
         // width: 120px;
         // background-color: #fff;
-        margin-left: 140px;
+        margin-left: 100px;
         padding-left: 15px;
         padding-right: 15px;
         display: flex;

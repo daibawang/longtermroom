@@ -204,6 +204,7 @@
           </el-form-item>
           <el-form-item label="区域" required>
             <template style="display:flex;display-direction:row">
+              <dir v-if="changecity!=null&&childMenu.length==0">该城市暂未绑定区域</dir>
               <el-checkbox-group v-model="checkedEquipments">
                 <el-checkbox
                   v-for="cityarear in childMenu"
@@ -418,7 +419,7 @@ export default {
       cur_page: 1, //当前页
       changecity: null, //管理的城市id,用于数据监听
       checkedEquipments: [], //多选框修改后的checked项（即要传到后台的变更数据）
-      saveEquipments: [], //临时存储用于更改后不丢失
+      saveEquipments: [], //
       childMenu: [], //该城市可选区域
       savecity: null, //选择管理的酒店所在的城市
       changetime: {},
@@ -490,20 +491,24 @@ export default {
   watch: {
     // data:'changecity'
     changecity(newName, oldName) {
-      console.log(this.changecity + newName);
+      // console.log(this.changecity + newName);
 
       if (newName != null) {
         console.log("修改了newNAME");
-        if (newName == this.changeinfoall.city.id) {
-          console.log("原来城市");
-          this.checkedEquipments = this.saveEquipments;
-        } else {
-          this.checkedEquipments = [];
+        if(this.changeinfoall.city!=null){
+          if (newName == this.changeinfoall.city.id) {
+            console.log("原来城市");
+            this.checkedEquipments = this.saveEquipments;
+          } else {
+            this.checkedEquipments = [];
+          }
         }
+        console.log(this.CityAreaList);
         this.childMenu = this.CityAreaList.find(
           item => item.id == newName
         ).areas;
-        console.log(this.saveEquipments);
+        // this.CityAreaList.find(item=>item.id==this.changeinfoall.city.id).areas;
+        console.log(this.childMenu);
       }
     }
   },

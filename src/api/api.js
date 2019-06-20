@@ -128,3 +128,8 @@ put_json("roomSelling/updateRoomSellingDate", selectpram)
 //修改（新增）房日期
 export const insertRoomSellingDate=inserparm =>
 post_json("roomSelling/insertRoomSellingDate",inserparm)
+
+
+//上线下线 
+export const shutUpRoomSelling=status =>
+post("roomSelling/shutUpRoomSelling",status)

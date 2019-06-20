@@ -54,9 +54,11 @@ export default {
     if (this.whatRouter == "House") {
       this.styles.width = "380px";
     } else if (this.whatRouter == "Hotel") {
-      this.styles.width = "270px";
+      this.styles.width = "260px";
     } else if (this.whatRouter == "Order") {
-      this.styles.width = "400px";
+      this.styles.width = "500px";
+    }else if (this.whatRouter == "Other") {
+      this.styles.width = "620px";
     }
   }
 };
@@ -68,7 +70,7 @@ export default {
   height: 42px;
   background-color: #22313e;
   &-container {
-    width: 1050px;
+    width: 1100px;
     height: inherit;
     margin: 0 auto;
     .Hotel-container-view {

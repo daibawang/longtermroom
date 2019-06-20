@@ -391,10 +391,56 @@
           <el-button type="primary" @click="addsellroomaproval">确 定</el-button>
         </div>
     </el-dialog>
+    <el-dialog :visible.sync="moresellroomdialogVisible" :title="selltitle" class="HouseList-main-container-dialog">
+        <el-form
+          class="dialog-elitem" 
+          ref="sellroomchange"
+          :model="sellroomchange"
+          label-width="200px"
+          style="width:60%;margin:0 auto">
+            <el-form-item  label="售卖房型名称" >
+              <template>
+                <span class="dialog-name">{{sellroomchange.roomName}}</span>
+              </template>
+            </el-form-item>
+            <el-form-item  label="修改日期" >
+              <template>
+                <span class="dialog-name">{{sellroomchange.sellingDate}}</span>
+              </template>
+            </el-form-item>
+            <el-form-item  label="房态" >
+              <el-radio v-model="sellroomchange.sellingStage" :label=1>开房</el-radio>
+              <el-radio v-model="sellroomchange.sellingStage" :label=2>关房</el-radio>
+            </el-form-item>
+            <el-form-item  label="房价" >
+              <el-input 
+                v-model="sellroomchange.price"
+                style="width:180px;">
+              </el-input>
+            </el-form-item>
+            <el-form-item  label="最晚确认时间" >
+              <el-time-picker
+                format="HH:mm:ss"
+                value-format="HH:mm:ss"
+                v-model="sellroomchange.lastOrder"
+                placeholder="选择最晚预定时间"
+              >
+              </el-time-picker>
+            </el-form-item>
+            <el-form-item  label="库存售完是否自动关房">
+              <el-radio v-model="sellroomchange.autoOff" :label=0>是</el-radio>
+              <el-radio v-model="sellroomchange.autoOff" :label=1>否</el-radio>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="moresellroomdialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="moresellroomaproval">确 定</el-button>
+        </div>
+    </el-dialog>
   </div>
 </template>
 <script>
-import {insertRoomSellingDate,updateRoomSellingDate,findRoomNoPage,selectSellRoom,insertSellRoom,findRoomByHotelId,selectHotelList,selecthotelname,selectAllCities,findRoomBed} from "@/api/api.js";
+import {shutUpRoomSelling,insertRoomSellingDate,updateRoomSellingDate,findRoomNoPage,selectSellRoom,insertSellRoom,findRoomByHotelId,selectHotelList,selecthotelname,selectAllCities,findRoomBed} from "@/api/api.js";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 export default {
   name: "hotelRoom",
@@ -435,6 +481,7 @@ export default {
       roomdialogVisible:false,
       sellroomdialogVisible:false,
       addsellroomdialogVisible:false,
+      moresellroomdialogVisible:false,
       title:null,
       addsellroominfo:{},
       addsellroom:{},
@@ -442,6 +489,7 @@ export default {
       showmonth:new Date(),
       selectMonth:'',
       sellroomchange:{},
+      moresellroomchange:{},
       selltitle:'修改售卖日期'
     };
   },
@@ -712,10 +760,65 @@ export default {
     },
     //上下线房型
     changeSellOffline(roomid,offline){
+      console.log(roomid);
+      var changeoffline=null;
+      var offlinetips='上线';
+       var findroom=this.tabledata.find(
+            item => item.id == roomid
+        );
+        if(findroom.sellRoom[0].offline==0){
+          changeoffline=1;
+
+        }else{
+          changeoffline=0;
+        }
+      shutUpRoomSelling({offline:changeoffline,id:roomid})
+        .then(res=>{
+          if(res.message=="SUCCESS"){
+            console.log();
+            var newMonth=new Date();
+            var nowMonth=newMonth.getMonth()+1+'';
+            this.updateSellDateInfo(findroom,roomid,newMonth.getFullYear()+"-"+nowMonth.padStart(2,"0"));
+            this.$message({
+                type: "success",
+                message: "上线成功!"
+              });
+          }
+        })
+        .catch(err =>{
+
+        })
 
     },
+    clickday(roomNum,date,wuliid,shoumaiid,roomName,sellitem){
+      console.log(sellitem);
+      if(date.type=='current-month'){
+          this.sellroomchange={}
+          if(sellitem.isset==0){
+            //原来不存在，现在新增
+            // this.sellroomchange={autoOff:0,id:0,price:null,roomSellingId:shoumaiid,sellingDate:date.day,sellingStage:1};
+            this.sellroomchange={roomName:roomName,wuliid:wuliid,lastOrder:'00:00:00',price:null,roomSellingId:shoumaiid,sellingDate:date.day,sellingStage:1,num:roomNum,soldNum:0};
+            this.addsellroomdialogVisible=true
+          }else{
+            this.sellroomchange=sellitem;
+            this.sellroomchange.roomName=roomName;
+            this.sellroomchange.wuliid=wuliid;
+            this.sellroomdialogVisible=true;
+          }
+          console.log(this.sellroomchange);
+          
+      }
+    },
     //批量修改
-    changemoresellroom(roomid){
+    changemoresellroom(roomid,sellitem,roomName,wuliid){
+      this.moresellroomchange={};
+      this.moresellroomchange=sellitem;
+      this.moresellroomchange.roomName=roomName;
+      this.moresellroomchange.wuliid=wuliid;
+      this.moresellroomdialogVisible=true;
+    },
+    //确认批量修改
+    moresellroomaproval(){
 
     }
   }

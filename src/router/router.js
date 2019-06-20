@@ -21,7 +21,7 @@ const myRouter = new Router({
       path: "/",
       name: "home",
       component: getRootComponent("Home"),
-      redirect: { name: "Hotel" },
+      redirect: { name: "Order" },
       meta: { title: "主页" },
       children: [
         {
@@ -83,7 +83,22 @@ const myRouter = new Router({
               path: "orderList",
               component: () => import("@/views/order/orderList/index"), // Parent router-view
               name: "orderList",
-              meta: { title: "订单查询" }
+              meta: { title: "订单管理" }
+            }
+          ]
+        },
+        {
+          path: "/other",
+          name: "Other",
+          component: () => import("@/views/other/index"),
+          redirect: "/other/otherBanner",
+          meta: { title: "其他" },
+          children: [
+            {
+              path: "otherBanner",
+              component: () => import("@/views/other/otherBanner/index"), // Parent router-view
+              name: "otherBanner",
+              meta: { title: "活动管理" }
             }
           ]
         }
