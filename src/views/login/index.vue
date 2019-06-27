@@ -31,7 +31,7 @@
 <script>
 import { login } from "@/api/api.js";
 import { messages } from "@/assets/js/common.js";
-import { getCookie } from "@/assets/js/cookie.js";
+import { getCookie,setCookie } from "@/assets/js/cookie.js";
 // import { mapState } from 'vuex';
 export default {
   name: "login",
@@ -73,8 +73,9 @@ export default {
             .then(res => {
               // console.log(res);
               //提交数据到vuex
-              var jwt = getCookie("jwt");
-              this.$store.commit("commitToken", jwt);
+              // var jwt = getCookie("jwt");
+              setCookie("jwt",res.user.token);
+              this.$store.commit("commitToken", res.user.token);
               this.$store.commit("commitInfo", res.user);
               if (res.user.role == "user") {
                 this.$router.push({

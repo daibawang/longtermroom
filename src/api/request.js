@@ -4,9 +4,11 @@ import { Loading } from "element-ui";
 import { messages } from "../assets/js/common.js"; //封装的提示文件
 import store from "../store/store"; //引入vuex
 import Qs from "qs";
-
 axios.defaults.timeout = 60000; //设置接口超时时间
-axios.defaults.baseURL = "/apis/"; //根据环境设置基础路径
+axios.defaults.baseURL = process.env.BASE_URL; //根据环境设置基础路径
+// axios.defaults.baseURL = '/apis/'; //根据环境设置基础路径
+axios.defaults.headers['Content-Type'] = 
+'application/x-www-form-urlencoded;charset=UTF-8';
 axios.defaults.headers.post["Content-Type"] =
   "application/x-www-form-urlencoded;charset=UTF-8"; //设置编码
 // axios.defaults.headers.post["Content-Type"] =

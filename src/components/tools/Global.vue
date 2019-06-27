@@ -97,7 +97,14 @@ const facilitiesoption = [
       "行政酒廊、唤醒服务、欢迎礼品、语音留言、免费报纸、更衣室、连通房、私人入口"
   }
 ];
-
+const orderoption=[
+  { value: 0, label: "未支付" },
+  { value: 1, label: "已支付" },
+  { value: 2, label: "退订中" },
+  { value: 3, label: "退款中" },
+  { value: 4, label: "离店中" },
+  { value: 5, label: "已关闭" }
+]
 export default {
   starimg,
   addbedoption,
@@ -106,6 +113,7 @@ export default {
   smokeoption,
   facilitiesoption,
   mealoption,
-  remainoption
+  remainoption,
+  orderoption
 };
 </script>

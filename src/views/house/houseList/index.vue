@@ -69,7 +69,7 @@
       <span>{{ selecthotel.hotelName }}</span>
     </div>
     <div class="HouseList-main-container-list" v-if="showsell">
-      <el-collapse @change="handleChange">
+      <el-collapse v-model="activeNames" @change="handleChange" accordion>
           <div v-for="roomitem in tabledata" :key="roomitem.id" >
           <el-collapse-item :name="roomitem.id">
             <template slot="title">
@@ -158,7 +158,7 @@
                       type="primary"
                       size="mini"
                       plain
-                      @click="changemoresellroom(roomitem.id)"
+                      @click="changemoresellroom(roomitem.id,sellitem.id,roomitem.roomName)"
                       >修改
                   </el-button>
                   <el-button
@@ -188,9 +188,9 @@
                         slot-scope="{date, data}">
                         <div :class="data.type=='current-month'?'content-nowmonthitem':'content-monthitem'" @click.stop @click="clickday(roomitem.roomNum,data,sellitem.id,roomitem.id,roomitem.roomName,sellitem.roomSellingDateList[data.day.substr(8,2)>'10'?data.day.substr(8,2):data.day.substr(9,1)])" >
                           <div v-if="data.type=='current-month'" class="nowday-item">
-                            <!-- <div class="nowday-sell nowday-close">开</div> -->
+                            <!-- <div class="nowday-sell nowday-close">蔡{{sellitem.roomSellingDateList}}</div> -->
                             <!-- <div class="nowday-sell">{{sellitem.roomSellingDateList[data.day.substr(8,2)].sellingStage==1||ellitem.roomSellingDateList[data.day.substr(8,2)].sellingStage==null?'关':'开'}}</div> -->
-                              <div @click.stop @click="changeroomsell(data.day,sellitem.roomSellingDateList[data.day.substr(8,2)>'10'?data.day.substr(8,2):data.day.substr(9,1)].id)"  :class="sellitem.roomSellingDateList[data.day.substr(8,2)>'10'?data.day.substr(8,2):data.day.substr(9,1)].sellingStage==1?'nowday-sell':'nowday-close'">
+                              <div  v-if="sellitem.roomSellingDateList!=null" @click.stop @click="changeroomsell(roomitem.id,data.day,sellitem.roomSellingDateList[data.day.substr(8,2)>'10'?data.day.substr(8,2):data.day.substr(9,1)])"  :class="sellitem.roomSellingDateList[data.day.substr(8,2)>'10'?data.day.substr(8,2):data.day.substr(9,1)].sellingStage==1?'nowday-sell':'nowday-close'">
                               {{sellitem.roomSellingDateList[data.day.substr(8,2).replace(/\b(0+)/gi,"")].sellingStage==1?'开':'关'}}
                               </div>
                             <div class="nowday-day">
@@ -394,27 +394,36 @@
     <el-dialog :visible.sync="moresellroomdialogVisible" :title="selltitle" class="HouseList-main-container-dialog">
         <el-form
           class="dialog-elitem" 
-          ref="sellroomchange"
-          :model="sellroomchange"
+          ref="moresellroomchange"
+          :model="moresellroomchange"
           label-width="200px"
-          style="width:60%;margin:0 auto">
+          style="width:85%;margin:0 auto">
             <el-form-item  label="售卖房型名称" >
               <template>
-                <span class="dialog-name">{{sellroomchange.roomName}}</span>
+                <span class="dialog-name">{{moresellroomchange.roomName}}</span>
               </template>
             </el-form-item>
             <el-form-item  label="修改日期" >
               <template>
-                <span class="dialog-name">{{sellroomchange.sellingDate}}</span>
+                <el-date-picker
+                  :picker-options="pickerOptions0"
+                  v-model="moresellroomchange.sellingDate"
+                  type="daterange"
+                  value-format="yyyy-MM-dd"
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期">
+                </el-date-picker>
+                <!-- <span class="dialog-name">{{moresellroomchange.sellingDate}}</span> -->
               </template>
             </el-form-item>
             <el-form-item  label="房态" >
-              <el-radio v-model="sellroomchange.sellingStage" :label=1>开房</el-radio>
-              <el-radio v-model="sellroomchange.sellingStage" :label=2>关房</el-radio>
+              <el-radio v-model="moresellroomchange.sellingStage" :label=1>开房</el-radio>
+              <el-radio v-model="moresellroomchange.sellingStage" :label=2>关房</el-radio>
             </el-form-item>
             <el-form-item  label="房价" >
               <el-input 
-                v-model="sellroomchange.price"
+                v-model="moresellroomchange.price"
                 style="width:180px;">
               </el-input>
             </el-form-item>
@@ -422,14 +431,14 @@
               <el-time-picker
                 format="HH:mm:ss"
                 value-format="HH:mm:ss"
-                v-model="sellroomchange.lastOrder"
+                v-model="moresellroomchange.lastOrder"
                 placeholder="选择最晚预定时间"
               >
               </el-time-picker>
             </el-form-item>
             <el-form-item  label="库存售完是否自动关房">
-              <el-radio v-model="sellroomchange.autoOff" :label=0>是</el-radio>
-              <el-radio v-model="sellroomchange.autoOff" :label=1>否</el-radio>
+              <el-radio v-model="moresellroomchange.autoOff" :label=0>是</el-radio>
+              <el-radio v-model="moresellroomchange.autoOff" :label=1>否</el-radio>
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -440,12 +449,14 @@
   </div>
 </template>
 <script>
-import {shutUpRoomSelling,insertRoomSellingDate,updateRoomSellingDate,findRoomNoPage,selectSellRoom,insertSellRoom,findRoomByHotelId,selectHotelList,selecthotelname,selectAllCities,findRoomBed} from "@/api/api.js";
+import {shutUpRoomSellingDate,updatamoreSellingDate,shutUpRoomSelling,insertRoomSellingDate,updateRoomSellingDate,findRoomNoPage,selectSellRoom,insertSellRoom,findRoomByHotelId,selectHotelList,selecthotelname,selectAllCities,findRoomBed} from "@/api/api.js";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
+import {formatdate} from "@/assets/js/common.js";
 export default {
   name: "hotelRoom",
   data() {
     return {
+      activeNames:'',
       canadd: false,
       searchform: {
         cityName: null,
@@ -490,23 +501,31 @@ export default {
       selectMonth:'',
       sellroomchange:{},
       moresellroomchange:{},
-      selltitle:'修改售卖日期'
+      selltitle:'修改售卖日期',
+      today:''
     };
   },
   watch: {
     // data:'changecity'
     selectMonth(newMonth, oldMonth) {
+      console.log("data:'changecity'");
+      
       this.showmonth=new Date(Date.parse(newMonth))
     },
     showmonth(newMonth, oldMonth){
       if(newMonth!=oldMonth){
-        var nowMonth=newMonth.getMonth()+1;
-        this.selectMonth=newMonth.getFullYear()+"-"+nowMonth+"-01"
+        var nowMonth=(newMonth.getMonth()+1)+'';
+        this.selectMonth=newMonth.getFullYear()+"-"+nowMonth+"-01";
+        nowMonth=nowMonth.padStart(2,"0");
+        var uptime=newMonth.getFullYear()+"-"+nowMonth;
+        // 
+        this.updateSellDateInfo(this.activeNames,uptime);
       }
     }
   },
   created: function() {
     console.log(new Date());
+    this.today=formatdate(new Date())
     this.searchroom('begin');
     selectHotelList({}).then(res => {
       this.$store.commit("hotel/commitAllHotel", res.result);
@@ -576,6 +595,7 @@ export default {
       this.selecthotel = item;
       findRoomNoPage({hotelId:this.selecthotel.id})
         .then(res=>{
+            this.activeNames='';//置空折叠面板选择
             var areaarray=[];
             var location=[];
             var showbedList=[];
@@ -593,6 +613,7 @@ export default {
                 showbedList=[];
                 // roomlist[i].area=area[0]
             }
+            console.log("roomlist");
             console.log(roomlist);
             this.tabledata=roomlist;
             console.log(this.tabledata);
@@ -620,6 +641,7 @@ export default {
       insertSellRoom(this.addsellroom)
         .then(res=>{
           if(res.message=="SUCCESS"){
+            this.seehotel(this.selecthotel);
             this.$message({
               type: "success",
               message: "新增售卖房型成功!"
@@ -632,29 +654,37 @@ export default {
     },
   //查看售卖房型
     handleChange(val) {
-      if(val.length!=0){
+      console.log("val");
+      console.log(val);
+      if(val!=''){
         //物理房型id
         var findroom=this.tabledata.find(
-            item => item.id == val[0]
+            item => item.id == val
         );
         console.log(findroom);
-        if(findroom.sellRoom==null){
-          var newMonth=new Date();
-          var nowMonth=newMonth.getMonth()+1+'';
-          this.updateSellDateInfo(findroom,val[0],newMonth.getFullYear()+"-"+nowMonth.padStart(2,"0"));
+        if(findroom){
+          if(findroom.sellRoom==null){
+            var newMonth=new Date();
+            var nowMonth=newMonth.getMonth()+1+'';
+            this.updateSellDateInfo(val,newMonth.getFullYear()+"-"+nowMonth.padStart(2,"0"));
+          }
         }
-
       }
     },
     //刷新日历
-    updateSellDateInfo(findroom,roomid,monthdata){
+    updateSellDateInfo(roomid,monthdata){
+      var findroom=this.tabledata.find(
+            item => item.id == roomid
+      );
+      findroom.sellRoom={};
+      console.log("刷新");
       var pram={};
       pram.roomId=roomid;
       pram.sellingDate=monthdata;
       selectSellRoom(pram)
         .then(res=>{
-          var gettercalendar=Array(31).fill({isset:0,num:0,soldNum:0});
-          // var gettercalendar=Array(31).fill({autoOff:0,num:0,price:null,sellingStage:2,soldNum:0,autoOff:0});
+          var gettercalendar=Array(32).fill({isset:0,num:0,soldNum:0,price:null,sellingStage:2,soldNum:0,autoOff:0});
+          // var gettercalendar=Array(32).fill({autoOff:0,num:0,price:null,sellingStage:2,soldNum:0,autoOff:0});
           var sellDate=[];
           for(var i=0;i<res.result.length;i++){
             if(res.result[i].roomSellingDateList.length>1){
@@ -666,15 +696,16 @@ export default {
               }
             }
             res.result[i].roomSellingDateList=gettercalendar;
-            gettercalendar=Array(31).fill({isset:0,num:0,soldNum:0});
+            gettercalendar=Array(32).fill({isset:0,num:0,soldNum:0,price:null,sellingStage:2,soldNum:0,autoOff:0});
           }
+          console.log(res.result);
           findroom.sellRoom=res.result;
       })
     },
     //选择日期,修改售卖房型
     clickday(roomNum,date,wuliid,shoumaiid,roomName,sellitem){
       console.log(sellitem);
-      if(date.type=='current-month'){
+      if(date.type=='current-month'&&date.day>this.today){
           this.sellroomchange={}
           if(sellitem.isset==0){
             //原来不存在，现在新增
@@ -688,7 +719,8 @@ export default {
             this.sellroomdialogVisible=true;
           }
           console.log(this.sellroomchange);
-          
+      }else if(date.day<this.today){
+        this.$confirm('已过日期不能修改');
       }
     },
     //修改售卖房型
@@ -697,9 +729,6 @@ export default {
       delete sellDate['roomName'];
       delete sellDate['isset'];
       var parm={upids:[this.sellroomchange.id],roomSellingDate:sellDate};
-      var findroom=this.tabledata.find(
-      item => item.id == this.sellroomchange.wuliid
-      );
       var uptime=this.sellroomchange.sellingDate.substr(0,7);
       if(this.sellroomchange.isset==1){
         //修改
@@ -708,8 +737,7 @@ export default {
             if(res.message=="SUCCESS"){
               console.log("this.sellroomchange");
               console.log(this.sellroomchange);
-              findroom.sellRoom={};
-              this.updateSellDateInfo(findroom,this.sellroomchange.wuliid,uptime);
+              this.updateSellDateInfo(this.sellroomchange.wuliid,uptime);
               this.$message({
                 type: "success",
                 message: "修改售卖房型日期成功!"
@@ -728,17 +756,13 @@ export default {
     //新增售卖房型
     addsellroomaproval(){
       var sellDate=JSON.parse(JSON.stringify(this.sellroomchange))
-      var findroom=this.tabledata.find(
-      item => item.id == this.sellroomchange.wuliid
-      );
       var uptime=this.sellroomchange.sellingDate.substr(0,7);
       console.log(sellDate);
       var parm={endDate:sellDate.sellingDate,roomSellingDate:sellDate,startDate:sellDate.sellingDate}
       insertRoomSellingDate(parm)
         .then(res=>{
             if(res.message=="SUCCESS"){
-              findroom.sellRoom={};
-              this.updateSellDateInfo(findroom,this.sellroomchange.wuliid,uptime);
+              this.updateSellDateInfo(this.sellroomchange.wuliid,uptime);
               this.$message({
                 type: "success",
                 message: "修改售卖房型日期成功!"
@@ -746,16 +770,27 @@ export default {
               this.addsellroomdialogVisible=false;
             }
           })
-      
     },
     //关闭单一房型
-    changeroomsell(day,id){
-      if(id==null){
+    changeroomsell(wuliid,day,sellitem){
+      if(sellitem.id==null){
         this.$confirm("该日期未设置，不能开房");
+      }else if(day<this.today){
+        this.$confirm("已过日期不能设置");
       }else{
+        var sellingStage=1;
+        if(sellitem.sellingStage==1){
+          sellingStage=2;
+        }
+        var parm={id:sellitem.id,sellingStage:sellingStage}
+        shutUpRoomSellingDate(parm)
+          .then(res=>{
+            this.updateSellDateInfo(wuliid,day.substr(0,7));
+          })
+          .catch(err=>{
+
+          })
       }
-      console.log(day);
-      console.log(id);
       
     },
     //上下线房型
@@ -763,9 +798,6 @@ export default {
       console.log(roomid);
       var changeoffline=null;
       var offlinetips='上线';
-       var findroom=this.tabledata.find(
-            item => item.id == roomid
-        );
         if(findroom.sellRoom[0].offline==0){
           changeoffline=1;
 
@@ -778,7 +810,7 @@ export default {
             console.log();
             var newMonth=new Date();
             var nowMonth=newMonth.getMonth()+1+'';
-            this.updateSellDateInfo(findroom,roomid,newMonth.getFullYear()+"-"+nowMonth.padStart(2,"0"));
+            this.updateSellDateInfo(roomid,newMonth.getFullYear()+"-"+nowMonth.padStart(2,"0"));
             this.$message({
                 type: "success",
                 message: "上线成功!"
@@ -788,38 +820,43 @@ export default {
         .catch(err =>{
 
         })
-
-    },
-    clickday(roomNum,date,wuliid,shoumaiid,roomName,sellitem){
-      console.log(sellitem);
-      if(date.type=='current-month'){
-          this.sellroomchange={}
-          if(sellitem.isset==0){
-            //原来不存在，现在新增
-            // this.sellroomchange={autoOff:0,id:0,price:null,roomSellingId:shoumaiid,sellingDate:date.day,sellingStage:1};
-            this.sellroomchange={roomName:roomName,wuliid:wuliid,lastOrder:'00:00:00',price:null,roomSellingId:shoumaiid,sellingDate:date.day,sellingStage:1,num:roomNum,soldNum:0};
-            this.addsellroomdialogVisible=true
-          }else{
-            this.sellroomchange=sellitem;
-            this.sellroomchange.roomName=roomName;
-            this.sellroomchange.wuliid=wuliid;
-            this.sellroomdialogVisible=true;
-          }
-          console.log(this.sellroomchange);
-          
-      }
     },
     //批量修改
-    changemoresellroom(roomid,sellitem,roomName,wuliid){
+    changemoresellroom(roomid,roomSellingId,roomName){
       this.moresellroomchange={};
-      this.moresellroomchange=sellitem;
-      this.moresellroomchange.roomName=roomName;
-      this.moresellroomchange.wuliid=wuliid;
+      // this.moresellroomchange=sellitem;
+      this.moresellroomchange={roomid:roomid,sellingDate:'',roomName:roomName,roomSellingId:roomSellingId,lastOrder:'00:00:00',price:null,sellingStage:1,num:0,soldNum:0};
+      console.log(this.moresellroomchange);
       this.moresellroomdialogVisible=true;
     },
     //确认批量修改
     moresellroomaproval(){
+      console.log(this.moresellroomchange);
+      var roomsell=JSON.parse(JSON.stringify(this.moresellroomchange));
+      var pram = {startDate:this.moresellroomchange.sellingDate[0],endDate:this.moresellroomchange.sellingDate[1],roomSellingDate:{}}
+      roomsell.id=0;
+      var roomid=roomsell.roomid;
+      delete roomsell.sellingDate;
+      delete roomsell.roomName;
+      delete roomsell.roomid;
+      pram.roomSellingDate=roomsell;
+      updatamoreSellingDate(pram)
+        .then(res=>{
+          console.log(res);
+          if(res.message=='SUCCESS'){
+            var changemonth=pram.startDate.substr(0,7);
+            console.log(changemonth);
+            this.updateSellDateInfo(roomid,changemonth);
+            this.$message({
+                type: "success",
+                message: "修改成功!"
+              });
+            this.moresellroomdialogVisible=false;
+          }
+        })
+        .catch(err=>{
 
+        })
     }
   }
 };
@@ -1041,6 +1078,12 @@ export default {
   &-dialog{
      .dialog-elitem /deep/ .el-form-item__label{
         font-size: 16px ;
+      }
+      .dialog-elitem /deep/ .el-range-separator{
+        padding:0;
+      }
+      .dialog-elitem /deep/ .el-range-input{
+        width:32%;
       }
     .dialog-name{
       font-weight: bold;

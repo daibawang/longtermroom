@@ -18,8 +18,9 @@ export function formatdatetime(fmt, time) {
 export function formatdate(fmt) {
   fmt = new Date(fmt);
   var year = fmt.getFullYear();
-  var month = fmt.getMonth() + 1;
+  var month = (fmt.getMonth() + 1)+'';
   var date = fmt.getDate();
+  month=month.padStart(2,"0");
   return [year, month, date].join("-");
 }
 

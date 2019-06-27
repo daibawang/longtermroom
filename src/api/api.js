@@ -129,7 +129,27 @@ put_json("roomSelling/updateRoomSellingDate", selectpram)
 export const insertRoomSellingDate=inserparm =>
 post_json("roomSelling/insertRoomSellingDate",inserparm)
 
+//批量修改售卖房型
+export const updatamoreSellingDate = updataparm =>
+post_json("roomSelling/updateManyRoomSellingDate",updataparm)
 
 //上线下线 
 export const shutUpRoomSelling=status =>
 post("roomSelling/shutUpRoomSelling",status)
+
+//开房关房 roomSelling/shutUpRoomSellingDate
+export const shutUpRoomSellingDate=sellstatus =>
+post("roomSelling/shutUpRoomSellingDate",sellstatus)
+
+//查询订单
+export const selectOrders = selectOrders =>
+  get("order/selectOrders", selectOrders);
+
+  
+//离店退押金审核
+export const leaveRefundAudit = leaveRefundAudit =>
+post("order/leaveRefundAudit", leaveRefundAudit);
+
+//退款审核
+export const refundAudit = refundAudit =>
+post("order/refundAudit", refundAudit);
