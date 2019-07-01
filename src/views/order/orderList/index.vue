@@ -11,9 +11,9 @@
           >
             <el-option
               v-for="item in orderoption"
-              :key="item.id"
+              :key="item.value"
               :label="item.label"
-              :value="item.id"
+              :value="item.value"
             >
             </el-option>
           </el-select>
@@ -29,15 +29,16 @@
               format="yyyy-MM-dd"
               value-format="yyyy-MM-dd"
               type="date"
-              v-model="changetime.createTime"
+              v-model="searchform.createTime"
               placeholder="选择下单日期"
             >
           </el-date-picker>
         </el-form-item>
         <el-form-item label="日期选择">
            <el-date-picker
-              v-model="changetime.Timevalue"
+              v-model="searchform.Timevalue"
               type="daterange"
+              value-format="yyyy-MM-dd"
               range-separator="至"
               start-placeholder="开始日期"
               end-placeholder="结束日期">
@@ -79,17 +80,17 @@
     </div>
     <div class="OrderList-main-container-list">
       <el-table ref="multipleTable" :data="tableData" style="width: 100%">
-        <el-table-column width="90" label="订单ID" prop="id" />
-        <el-table-column width="100" label="城市" prop="cityName" />
+        <el-table-column width="150" label="订单ID" prop="orderNumber" />
+        <el-table-column width="90" label="城市" prop="cityName" />
         <el-table-column width="170" label="酒店" prop="hotelName" />
-        <el-table-column width="150" label="入离时间">
+        <el-table-column width="140" label="入离时间">
           <template slot-scope="scope">
             {{scope.row.startTime}}至
             <br>
             {{scope.row.endTime}}
           </template>
         </el-table-column>
-        <el-table-column width="150" label="入住人">
+        <el-table-column width="130" label="入住人">
           <template slot-scope="scope" >
             {{scope.row.name}}<br><span style="color:#989797">({{scope.row.peoples}})人</span>
           </template>
@@ -99,18 +100,18 @@
             {{scope.row.roomName}}<{{scope.row.bedType}}>
           </template>
         </el-table-column>
-        <el-table-column width="150" label="订单/支付状态 " prop="orderStatetext"/>
+        <el-table-column width="140" label="订单/支付状态 " prop="orderStatetext"/>
         <el-table-column label="操作">
           <template slot-scope="scope">
               <el-button
-                v-if="scope.row.orderState==3"
+                v-if="scope.row.orderState==2"
                 size="small"
                 type="primary"
                 @click="refundAudit(scope.$index, scope.row)"
                 >审核
               </el-button>
               <el-button
-                v-if="scope.row.orderState==5"
+                v-if="scope.row.orderState==4"
                 size="small"
                 type="success"
                 @click="leaveRefundAudit(scope.$index, scope.row)"
@@ -137,147 +138,80 @@
         >
         </el-pagination>
       </div>
-
-      <!-- 修改增加 -->
-      <el-dialog :visible.sync="dialogFormVisible" :title="title">
+      <el-dialog :visible.sync="leavedia" title="押金审核">
         <el-form
-          :rules="rules"
-          ref="changeinfoall"
-          :model="changeinfoall"
+          ref="leaveinfo"
+          :model="leaveinfo"
           label-width="120px"
           style="width:70%;margin:0 auto"
         >
-          <el-form-item label="酒店ID" v-if="!addhotel">
+          <el-form-item label="订单ID">
             <el-input
-              v-model="changeinfoall.id"
+              v-model="leaveinfo.orderNumber"
               disabled
-              style="width:130px;"
+              style="width:170px;"
             ></el-input>
           </el-form-item>
-          <el-form-item label="酒店名称" prop="hotelName" required>
-            <el-input v-model="changeinfoall.hotelName"></el-input>
+          <el-form-item label="退款金额" required>
+            <el-radio v-model="agree" label='true'>全额退款</el-radio>
+            <el-radio v-model="agree" label='false'>部分退款</el-radio>
           </el-form-item>
-          <el-form-item label="城市" class="is-required">
-            <el-select v-model="changecity" style="width:130px;">
-              <el-option
-                v-for="item in orderoption"
-                :key="item.id"
-                :label="item.cityName"
-                :value="item.id"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="酒店地址">
-            <el-input v-model="changeinfoall.address"></el-input>
-          </el-form-item>
-          <el-form-item label="酒店介绍">
+          <el-form-item label="扣除金额" v-if="showreturn">
             <el-input
-              v-model="changeinfoall.introduce"
-              type="textarea"
-              rows="3"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="联系方式">
-            <el-input
-              style="width:180px;"
-              v-model="changeinfoall.telephone"
+              v-model="leaveinfo.money"
+              style="width:120px"
               type="number"
             ></el-input>
+            元
           </el-form-item>
-          <el-form-item label="酒店品牌">
-            <el-select v-model="changeinfoall.brandId" placeholder="请选择">
-              <el-option
-                v-for="item in getbrandoption"
-                :key="item.id"
-                :label="item.brandName"
-                :value="item.id"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="星级">
-            <el-rate
-              v-model="changeinfoall.star"
-              style="margin-top:10px;"
-            ></el-rate>
-          </el-form-item>
-          <el-form-item label="售卖状态" prop="saleStatus" required>
-            <el-select
-              v-model="changeinfoall.saleStatus"
-              placeholder="请选择售卖状态"
-              style="width:130px;"
-            >
-              <el-option
-                v-for="item in options2"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="最晚预定时间">
-            <el-time-picker
-              format="HH:mm:ss"
-              value-format="HH:mm:ss"
-              v-model="changeinfoall.createTime"
-              placeholder="选择最晚预定时间"
-            >
-            </el-time-picker>
-          </el-form-item>
-          <el-form-item label="最晚确定时间">
-            <el-time-picker
-              format="HH:mm:ss"
-              value-format="HH:mm:ss"
-              v-model="changeinfoall.lastConfirm"
-              placeholder="选择最晚确定时间"
-            >
-            </el-time-picker>
-          </el-form-item>
-          <!-- 管理 -->
-          <el-form-item label="酒店图集" v-if="!addhotel">
-            <template>
-              <div class="flexrow imgflex">
-                <img
-                  v-if="urls.length == 0"
-                  style="width: 280px; height: 180px"
-                  src="@img/noimg.png"
-                  alt=""
-                />
-                <!-- <el-image
-                  style="width: 250px; height: 180px" src="@img/noimg.png" :fit="contain">
-                </el-image> -->
-                <div class="hotellazy" v-if="urls.length > 0">
-                  <!-- <el-image v-for="url in showurls" :key="url" :src="url"></el-image> -->
-                  <el-image v-for="url in urls" :key="url.id" :src="url.url">
-                  </el-image>
-                </div>
-                <div class="hotelimgadmin">
-                  <el-button
-                    size="small"
-                    type="primary"
-                    @click="hotelimgVisible = !hotelimgVisible"
-                    >管理</el-button
-                  >
-                </div>
-              </div>
-            </template>
+          <el-form-item label="扣除理由" v-if="showreturn">
+            <el-input
+              v-model="leaveinfo.drefundEpositReason"
+              type="textarea"
+              :rows="4"
+            ></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <!-- 新增酒店 -->
+          <el-button @click="leavedia = false">取 消</el-button>
           <el-button
             type="primary"
-            @click="addapproval('changeinfoall')"
-            v-if="!changehotel"
+            @click="updataapproval()"
             >确 定</el-button
           >
-          <!-- 修改酒店 -->
+        </div>
+      </el-dialog>
+      <el-dialog :visible.sync="returndia" title="订单审核">
+        <el-form
+          ref="returninfo"
+          :model="returninfo"
+          label-width="120px"
+          style="width:70%;margin:0 auto"
+        >
+          <el-form-item label="订单ID">
+            <el-input
+              v-model="returninfo.orderNumber"
+              disabled
+              style="width:170px;"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="退款金额" required>
+            <el-radio v-model="returnagree" label='true'>通过</el-radio>
+            <el-radio v-model="returnagree" label='false'>不通过</el-radio>
+          </el-form-item>
+          <el-form-item label="不通过理由" v-if="showpass">
+            <el-input
+              v-model="returninfo.refuseRefundReason"
+              type="textarea"
+              :rows="4"
+            ></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="returndia = false">取 消</el-button>
           <el-button
             type="primary"
-            @click="updataapproval('changeinfoall')"
-            v-if="!addhotel"
+            @click="passapproval()"
             >确 定</el-button
           >
         </div>
@@ -289,19 +223,15 @@
 import Qs from "qs";
 import {
   selectHotelList,
-  insertHotel,
-  insertHotelArea,
-  selectAlbums,
   selectBrands,
   selectAllCities,
   selectHotelapi,
-  updateByPrimaryKey,
-  selectHotelareaapi,
-  deleteAlbumapi,
   selectAllCityAreas,
   selectOrders,
   leaveRefundAudit,
-  refundAudit
+  refundAudit,
+  stoporder,
+  leavehotel
 } from "@/api/api.js";
 import { mapState, mapGetters, mapActions, mapMutations } from "vuex";
 import { listAssign } from "@/assets/js/common.js";
@@ -318,47 +248,29 @@ export default {
         orderState: null,
         name: null,
         createTime:null,
-        Timevalue:[],
+        Timevalue:'',
         cityId:null,
         hotelName:null,
       },
-      timedialogVisible: false, //时间dialog
-      dialogFormVisible: false, //修改，增加dialog
+      leavedia:false, //退押金dialog
+      returndia:false,
+      showpass:false,
+      agree:'true',
+      returnagree:'true',
+      leaveinfo:{
+        orderNumber:null,
+        money:null,
+        drefundEpositReason:null
+      },
+      returninfo:{
+        orderNumber:null,
+        refuseRefundReason:null
+      },
+      showreturn:false,
       tableData: [], //酒店list
       total: null, //总条数
       pageSize: 8 , //每页显示数量，后台确定
       cur_page: 1, //当前页
-      changecity: null, //管理的城市id,用于数据监听
-      checkedEquipments: [], //多选框修改后的checked项（即要传到后台的变更数据）
-      saveEquipments: [], //
-      changetime: {},
-      changeinfoall: { hotel_name: "" },
-      title: null,
-      addhotel: false, //增加操作 用于v-if
-      changehotel: false, //修改操作 用于v-if
-      urls: [], //图集列表
-      fileList: [], // fileList: [{name: '', url: ''}],
-      // score: Array(5).fill({ src: "@/assets/img/star.png" }),
-      options2: [{ value: 1, label: "停售" }, { value: 0, label: "在售" }],
-      CityAreaList: null,
-      show: false, // 控制组件显示
-      uploadUrl: "/apis/album/uploadAlbum", // 上传地址
-      params: { hotelId: null }, //传递参数
-      myHeader: { Authorization: "Bearer " + getCookie("jwt") },
-      fieldName: "pic", // 上传文件名
-      noCircle: true,
-      noSquare: false,
-      width: 600, // 裁剪图片宽高(即所需要图片的宽高)
-      height: 375,
-      maxSize: 10240, // 大小限制
-      rules: {
-        hotelName: [
-          { required: true, message: "请输入酒店名称", trigger: "blur" }
-        ],
-        saleStatus: [
-          { required: true, message: "请选择售卖状态", trigger: "change" }
-        ]
-      }
     };
   },
   created: function() {
@@ -412,6 +324,20 @@ export default {
     })
   },
   watch: {
+    agree(newName, oldName) {
+      if(newName=='false'){
+        this.showreturn=true;
+      }else{
+        this.showreturn=false;
+      }
+    },
+    returnagree(newName, oldName){
+      if(newName=='false'){
+        this.showpass=true;
+      }else{
+        this.showpass=false;
+      }
+    }
   },
   methods: {
     //分页器
@@ -423,7 +349,6 @@ export default {
     //查询订单
     tosearch() {
       console.log("tosearch重新加载");
-
       var searchparm = JSON.parse(JSON.stringify(this.searchform));
       searchparm.startTime=searchparm.Timevalue[0];
       searchparm.endTime=searchparm.Timevalue[1];
@@ -455,116 +380,7 @@ export default {
       //深拷贝
       // var CityAreaList=JSON.parse(JSON.stringify(this.commitCityArea));
       // console.log(CityAreaList);
-    },
-    toadd() {
-      this.urls = [];
-      this.changeinfoall = {};
-      this.changecity = null; //置空城市
-      this.checkedEquipments = []; //置空已选中区域
-      this.childMenu = []; //置空城市子区域
-      this.dialogFormVisible = true;
-      this.addhotel = true;
-      this.changehotel = false;
-      this.title = "新增酒店";
-    },
-    //设定最晚时间
-    setorder(index, row) {
-      console.log();
-      this.timedialogVisible = true;
-      this.changetime = row;
-      console.log(this.changetime);
-    },
-    //确认设置最晚时间
-    suretime() {
-      this.timedialogVisible = false;
-      var changeparm = {
-        id: this.changetime.id + "",
-        lastConfirm: this.changetime.lastConfirm,
-        createTime: this.changetime.createTime
-      };
-      updateByPrimaryKey(changeparm)
-        .then(res => {
-          console.log(res);
-          if (res.message == "SUCCESS") {
-            this.$message("修改成功", res.message);
-          }
-        })
-        .catch(err => {
-          this.$message("修改失败", res.message);
-        });
-    },
-    //修改售卖状态更改
-    uploadhotel(row, meaasge) {
-      row.saleStatus = meaasge;
-      var changeparm = { id: row.id + "", saleStatus: meaasge };
-      updateByPrimaryKey(changeparm)
-        .then(res => {
-          if (res.message == "SUCCESS") {
-            // this.tosearch();
-            this.$message("修改成功", res.message);
-          }
-        })
-        .catch(err => {
-          this.$message("修改失败", res.message);
-        });
-      // console.log(row);
-    },
-    
-    //新增酒店
-    addapproval(changeinfoall) {
-      this.$refs[changeinfoall].validate(valid => {
-        if (
-          valid == true &&
-          this.checkedEquipments.length != 0 &&
-          this.changecity != null
-        ) {
-          // console.log("新增酒店");
-          // console.log(this.changeinfoall);
-          var newhotelinfo = {
-            hotelName: "",
-            brandId: null,
-            saleStatus: 0,
-            createTime: null,
-            lastConfirm: null,
-            star: null,
-            address: null,
-            telephone: null,
-            introduce: null,
-            remain: null,
-            id: null
-          };
-          listAssign(newhotelinfo, this.changeinfoall);
-          // console.log(newhotelinfo);
-          insertHotel(newhotelinfo)
-            .then(res => {
-              // console.log(res);
-              if (res.message == "SUCCESS") {
-                if (this.updateArea(res.HotelId, this.checkedEquipments)) {
-                  this.tosearch();
-                  this.$message("新增成功", res.message);
-                  this.changecity = null;
-                  this.changeinfoall = { hotel_name: "" };
-                  this.dialogFormVisible = false;
-                  this.$confirm("是否为酒店增加图片")
-                    .then(_ => {
-                      this.uploadnewimg(res.HotelId);
-                    })
-                    .catch(_ => {});
-                } else {
-                  this.$message("修改失败", res.message);
-                }
-              }
-            })
-            .catch(err => {});
-        } else {
-          this.$message({
-            message: "请填写相关信息",
-            type: "warning"
-          });
-          return false;
-        }
-      });
-    },
+    },    
     handleClose(done) {
       this.$confirm("确认关闭？")
         .then(_ => {
@@ -574,41 +390,88 @@ export default {
     },
     //退款审核
     refundAudit(index, row){
-      
-      
+      this.returndia=true;
+      this.returninfo.orderNumber=row.orderNumber;
+
+    },
+    passapproval(){
+      var param=JSON.parse(JSON.stringify(this.returninfo));
+      param.agree=this.returnagree=='true'?true:false;
+      refundAudit(param)
+        .then(res=>{
+          if(res.msg=="成功"){
+            this.tosearch();
+            this.returninfo={
+              orderNumber:null,
+              refuseRefundReason:null,
+            };
+            this.returnagree='true';
+            this.returndia=false;
+            this.$message({
+                showClose: true,
+                message: "审核成功",
+                type: "success"
+            });
+          }
+          
+        })
     },
     //离店退押金审核
     leaveRefundAudit(index,row){
-      
+      this.leavedia=true;
+      this.leaveinfo.orderNumber=row.orderNumber;
+      // 
+    },
+    updataapproval(){
+      var param=JSON.parse(JSON.stringify(this.leaveinfo));
+      param.agree=this.agree=='true'?true:false;
+      leavehotel(param)
+        .then(res=>{
+          if(res.msg=="成功"){
+            this.tosearch();
+            this.leaveinfo={
+              orderNumber:null,
+              money:null,
+              drefundEpositReason:null
+            };
+            this.agree='true';
+            this.leavedia=false;
+            this.$message({
+                showClose: true,
+                message: "退押金成功",
+                type: "success"
+            });
+          }
+          
+        })
     },
     //管理操作 强制停止
     stopoder(index, row) {
+      console.log("进来了");
+      
       console.log("saveEquipments");
+      var param={orderNumber:row.orderNumber};
       this.$confirm("是否终止该订单")
         .then(_ => {
-          // selectHotelareaapi({ hotelId: this.changeinfoall.id })
-          // .then(res => {
-          // })
-          // .catch(err => {
-          //   this.$message({
-          //     showClose: true,
-          //     message: "请求失败，请稍后再试",
-          //     type: "error"
-          //   });
-          // });
+          stoporder(param)
+          .then(res =>{
+            console.log("进来了");
+            this.tosearch();
+            this.$message({
+              showClose: true,
+              message: "已关闭该订单",
+              type: "success"
+            });
+          })
+          .catch(err=>{
+            this.$message({
+              showClose: true,
+              message: "请求失败，请稍后再试",
+              type: "error"
+            });
+          })
         })
-        .catch(_ => {});
-      
     },
-    toggleShow() {
-      this.show = !this.show;
-    },
-    cropUploadSuccess(jsonData, field) {
-      // console.log('-------- upload success --------');
-      this.loadingimg(this.params.hotelId);
-      // console.log(jsonData);
-      // console.log('field: ' + field);
-    }
   }
 };
 </script>

@@ -145,11 +145,14 @@ post("roomSelling/shutUpRoomSellingDate",sellstatus)
 export const selectOrders = selectOrders =>
   get("order/selectOrders", selectOrders);
 
-  
-//离店退押金审核
-export const leaveRefundAudit = leaveRefundAudit =>
-post("order/leaveRefundAudit", leaveRefundAudit);
+//结束订单
+export const stoporder = stoporder =>
+post("order/clossorder", stoporder);
+
+//离店退押金
+export const leavehotel = leavehotel =>
+post("order/leaveRefundAudit", leavehotel);
 
 //退款审核
 export const refundAudit = refundAudit =>
-post("order/refundAudit", refundAudit);
+post("order/leaveRefundAudit", refundAudit);
