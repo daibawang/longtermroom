@@ -48,7 +48,7 @@
           >
           <span
             class="hotellist-item-noshare"
-            :class="item.saleStatus == 0 ? 'show' : ''"
+            :class="item.saleStatus == 0 ? '' : 'show'"
             >[停售]</span
           >
         </div>
@@ -288,6 +288,8 @@
             </el-form-item>
             <el-form-item  label="押金" >
               <el-input
+                type="number"
+                min=0
                 v-model="addsellroom.deposit"
                 placeholder="请输入押金金额"
                 style="width:180px;">
@@ -322,7 +324,15 @@
             </el-form-item>
             <el-form-item  label="房价" >
               <el-input 
+                type=number
+                min=0
                 v-model="sellroomchange.price"
+                style="width:180px;">
+              </el-input>
+            </el-form-item>
+            <el-form-item  label="售卖房间数量" >
+              <el-input 
+                v-model="sellroomchange.soldNum"
                 style="width:180px;">
               </el-input>
             </el-form-item>
@@ -368,6 +378,8 @@
             </el-form-item>
             <el-form-item  label="房价" >
               <el-input 
+                type=number
+                min=0
                 v-model="sellroomchange.price"
                 style="width:180px;">
               </el-input>
@@ -424,6 +436,12 @@
             <el-form-item  label="房价" >
               <el-input 
                 v-model="moresellroomchange.price"
+                style="width:180px;">
+              </el-input>
+            </el-form-item>
+            <el-form-item  label="售卖房间数量" >
+              <el-input 
+                v-model="sellroomchange.soldNum"
                 style="width:180px;">
               </el-input>
             </el-form-item>
@@ -704,7 +722,7 @@ export default {
     },
     //选择日期,修改售卖房型
     clickday(roomNum,date,wuliid,shoumaiid,roomName,sellitem){
-      console.log(sellitem);
+      console.log(date);
       if(date.type=='current-month'&&date.day>this.today){
           this.sellroomchange={}
           if(sellitem.isset==0){
@@ -721,6 +739,8 @@ export default {
           console.log(this.sellroomchange);
       }else if(date.day<this.today){
         this.$confirm('已过日期不能修改');
+      }else if(date.day == this.today){
+        this.$confirm('当天信息不能修改');
       }
     },
     //修改售卖房型
@@ -776,20 +796,27 @@ export default {
       if(sellitem.id==null){
         this.$confirm("该日期未设置，不能开房");
       }else if(day<this.today){
+        console.log(day);
+        console.log(this.today);
+        
         this.$confirm("已过日期不能设置");
       }else{
         var sellingStage=1;
         if(sellitem.sellingStage==1){
           sellingStage=2;
         }
-        var parm={id:sellitem.id,sellingStage:sellingStage}
-        shutUpRoomSellingDate(parm)
-          .then(res=>{
-            this.updateSellDateInfo(wuliid,day.substr(0,7));
-          })
-          .catch(err=>{
+        if(sellitem.price==0&&sellitem.sellingStage==1){
+          this.$confirm("当前房价为0元，不能开房");
+        }else{
+          var parm={id:sellitem.id,sellingStage:sellingStage}
+          shutUpRoomSellingDate(parm)
+            .then(res=>{
+              this.updateSellDateInfo(wuliid,day.substr(0,7));
+            })
+            .catch(err=>{
 
-          })
+            })
+        }
       }
       
     },

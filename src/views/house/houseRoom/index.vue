@@ -130,16 +130,16 @@
                 <el-input v-model="changeroom.roomName" style="width:220px"></el-input>
             </el-form-item>
             <el-form-item width="80" label="房间数量">
-                <el-input v-model="changeroom.roomNum" type="number" style="width:130px"></el-input>
+                <el-input v-model="changeroom.roomNum" type="number" min=0 style="width:130px"></el-input>
             </el-form-item>
             <el-form-item width="100" label="楼层">
-                <el-input v-model="changeroom.location1" style="width:50px"></el-input>
+                <el-input v-model="changeroom.location1" type="number" min=0 style="width:70px"></el-input>
                 <span>到</span>
-                <el-input v-model="changeroom.location2" style="width:50px"></el-input>
+                <el-input v-model="changeroom.location2" type="number" min=0 style="width:70px"></el-input>
                 <span>层</span>
             </el-form-item>
             <el-form-item width="100" label="面积">
-                <el-input v-model="changeroom.area" type="number" style="width:90px;margin-right:5px"></el-input>
+                <el-input v-model="changeroom.area" type="number" min=0 style="width:90px;margin-right:5px"></el-input>
                 <span>m^2</span>
             </el-form-item>
             <el-form-item width="100" label="床型">
@@ -167,7 +167,7 @@
                           required: true, message: '数量必填', trigger: 'blur'
                         }">
                         <template>
-                          <el-input :disabled="item.noexit==true?true:false" v-model="item.number" style="width:60px;" class="el-in-left-more" type="number"></el-input>
+                          <el-input :disabled="item.noexit==true?true:false" v-model="item.number" style="width:60px;" class="el-in-left-more" type="number">min=0 </el-input>
                           <span style="margin-right:5px">  张</span>
                         </template>
                         </el-form-item>
@@ -220,7 +220,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="最大入住成人数">
-                <el-input v-model="changeroom.maxPeoples" type="number" style="width:130px"></el-input>
+                <el-input v-model="changeroom.maxPeoples" type="number" min=0 style="width:130px"></el-input>
             </el-form-item>
             <el-form-item label="网络连接">
               <el-select
@@ -263,7 +263,7 @@
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="branddialogVisible = false">取 消</el-button>
+          <el-button @click="roomdialogVisible = false">取 消</el-button>
           <el-button type="primary" @click="addapproval">确 定</el-button>
         </div>
       </el-dialog>
@@ -593,7 +593,7 @@ export default {
         console.log("确定删除");
         deleteRoomImgapi(deletepram)
           .then(res => {
-            this.loadingimg(this.param.roomId);
+            this.loadingimg(this.params.roomId);
             this.$message({
               type: "success",
               message: "删除成功!"

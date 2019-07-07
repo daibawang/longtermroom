@@ -19,8 +19,9 @@ export function formatdate(fmt) {
   fmt = new Date(fmt);
   var year = fmt.getFullYear();
   var month = (fmt.getMonth() + 1)+'';
-  var date = fmt.getDate();
+  var date = fmt.getDate()+'';
   month=month.padStart(2,"0");
+  date=date.padStart(2,"0");
   return [year, month, date].join("-");
 }
 

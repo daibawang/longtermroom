@@ -443,12 +443,12 @@ export default {
       height: 375,
       maxSize: 10240, // 大小限制
       rules: {
-        hotelName: [
-          { required: true, message: "请输入酒店名称", trigger: "blur" }
-        ],
-        saleStatus: [
-          { required: true, message: "请选择售卖状态", trigger: "change" }
-        ]
+        // hotelName: [
+        //   { required: true, message: "请输入酒店名称", trigger: "blur" }
+        // ],
+        // saleStatus: [
+        //   { required: true, message: "请选择售卖状态", trigger: "change" }
+        // ]
       }
     };
   },
@@ -708,9 +708,9 @@ export default {
           // console.log(newhotelinfo);
           insertHotel(newhotelinfo)
             .then(res => {
-              // console.log(res);
+              console.log(res);
               if (res.message == "SUCCESS") {
-                if (this.updateArea(res.HotelId, this.checkedEquipments)) {
+                  this.updateArea(res.HotelId, this.checkedEquipments)
                   this.tosearch();
                   this.$message("新增成功", res.message);
                   this.changecity = null;
@@ -721,9 +721,8 @@ export default {
                       this.uploadnewimg(res.HotelId);
                     })
                     .catch(_ => {});
-                } else {
-                  this.$message("修改失败", res.message);
-                }
+              }else{
+                this.$message("修改失败", res.message);
               }
             })
             .catch(err => {});
@@ -798,10 +797,11 @@ export default {
     },
     //更新图片
     async loadingimg(qhotelId) {
-      // console.log("调用了loadingimg");
+      console.log("调用了loadingimg");
       var param = { hotelId: qhotelId };
       selectAlbums(param)
         .then(res => {
+          this.urls=[];
           this.urls = res.result;
           for (var j = 0; j < this.urls.length; j++) {
             this.urls[j].url = "apis/image/" + this.urls[j].url;
@@ -830,7 +830,7 @@ export default {
           // console.log("确定删除");
           deleteAlbumapi(deletepram)
             .then(res => {
-              this.loadingimg(this.param.hotelId);
+              this.loadingimg(this.params.hotelId);
               this.$message({
                 type: "success",
                 message: "删除成功!"
@@ -861,10 +861,7 @@ export default {
       this.show = !this.show;
     },
     cropUploadSuccess(jsonData, field) {
-      // console.log('-------- upload success --------');
       this.loadingimg(this.params.hotelId);
-      // console.log(jsonData);
-      // console.log('field: ' + field);
     }
   }
 };
